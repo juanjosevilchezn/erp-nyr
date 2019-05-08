@@ -10,6 +10,7 @@
           :rules="emailRules"
           label="E-mail"
           prepend-icon="email"
+          outline
           required
         />
 
@@ -21,6 +22,7 @@
           label="Contraseña"
           prepend-icon="lock"
           @click:append="showPassword = !showPassword"
+          outline
           required
         />       
 

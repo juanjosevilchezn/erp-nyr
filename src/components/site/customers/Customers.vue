@@ -1,134 +1,93 @@
 <template>
     <div id="customers">
-        <Navigation/>
-        <v-data-table :headers="headers" :items="desserts" class="elevation-1">
-            <template v-slot:items="props">
-            <td>{{ props.item.name }}</td>
-            <td class="text-xs-right">{{ props.item.calories }}</td>
-            <td class="text-xs-right">{{ props.item.fat }}</td>
-            <td class="text-xs-right">{{ props.item.carbs }}</td>
-            <td class="text-xs-right">{{ props.item.protein }}</td>
-            <td class="text-xs-right">{{ props.item.iron }}</td>
-            </template>
-        </v-data-table>
+        <Navigation app_part="Clientes"/>
+
+        <v-container fluid fill-height>
+            <v-layout row wrap style="width: 97.5%;">
+                <v-flex xs2>
+                    <v-btn
+                        block
+                        color="success"
+                        href="/customers/create">
+                        <v-icon>add_circle_outline</v-icon><span>&nbsp; Nuevo cliente</span>
+                    </v-btn>
+                </v-flex>
+
+                <v-flex xs12 mt-3>
+                    <v-card>
+                        <v-card-title>
+                            Listado de clientes
+                            <v-spacer></v-spacer>
+                            <v-text-field
+                                v-model="search"
+                                append-icon="search"
+                                label="Buscar..."
+                                single-line
+                                hide-details>
+                            </v-text-field>
+                        </v-card-title>
+                        
+                        <v-data-table
+                        :headers="headers"
+                        :items="customers"
+                        :search="search">
+                            <template v-slot:items="props">
+                                <td>{{ props.item.dni }}</td>
+                                <td>{{ props.item.name }}</td>
+                                <td>{{ props.item.surname }}</td>
+                                <td>{{ props.item.email }}</td>
+                                <td>{{ props.item.phone }}</td>
+                            </template>
+                            <template v-slot:no-results>
+                                <v-alert :value="true" color="error" icon="warning">
+                                Tu búsqueda para "{{ search }}" no tiene coincidencias.
+                                </v-alert>
+                            </template>
+                        </v-data-table>
+                    </v-card>
+                </v-flex>
+            </v-layout>
+        </v-container>
     </div>
 </template>
 
 <script>
+/* eslint-disable */
+
+import firebase from 'firebase'
 import Navigation from '../navigation/Navigation'
 
-export default {
+const db = firebase.firestore()
+let customersRef = db.collection('customers')
+
+export default {    
     name: 'Customers',
     components: {
         Navigation
     },
     data () {
         return {
-        headers: [
-            {
-            text: 'Dessert (100g serving)',
-            align: 'left',
-            sortable: false,
-            value: 'name'
-            },
-            { text: 'Calories', value: 'calories' },
-            { text: 'Fat (g)', value: 'fat' },
-            { text: 'Carbs (g)', value: 'carbs' },
-            { text: 'Protein (g)', value: 'protein' },
-            { text: 'Iron (%)', value: 'iron' }
-        ],
-        desserts: [
-            {
-            name: 'Frozen Yogurt',
-            calories: 159,
-            fat: 6.0,
-            carbs: 24,
-            protein: 4.0,
-            iron: '1%'
-            },
-            {
-            name: 'Ice cream sandwich',
-            calories: 237,
-            fat: 9.0,
-            carbs: 37,
-            protein: 4.3,
-            iron: '1%'
-            },
-            {
-            name: 'Eclair',
-            calories: 262,
-            fat: 16.0,
-            carbs: 23,
-            protein: 6.0,
-            iron: '7%'
-            },
-            {
-            name: 'Cupcake',
-            calories: 305,
-            fat: 3.7,
-            carbs: 67,
-            protein: 4.3,
-            iron: '8%'
-            },
-            {
-            name: 'Gingerbread',
-            calories: 356,
-            fat: 16.0,
-            carbs: 49,
-            protein: 3.9,
-            iron: '16%'
-            },
-            {
-            name: 'Jelly bean',
-            calories: 375,
-            fat: 0.0,
-            carbs: 94,
-            protein: 0.0,
-            iron: '0%'
-            },
-            {
-            name: 'Lollipop',
-            calories: 392,
-            fat: 0.2,
-            carbs: 98,
-            protein: 0,
-            iron: '2%'
-            },
-            {
-            name: 'Honeycomb',
-            calories: 408,
-            fat: 3.2,
-            carbs: 87,
-            protein: 6.5,
-            iron: '45%'
-            },
-            {
-            name: 'Donut',
-            calories: 452,
-            fat: 25.0,
-            carbs: 51,
-            protein: 4.9,
-            iron: '22%'
-            },
-            {
-            name: 'KitKat',
-            calories: 518,
-            fat: 26.0,
-            carbs: 65,
-            protein: 7,
-            iron: '6%'
-            }
-        ]
-        }
+            customers: [],
+            headers: [
+                { text: 'DNI', value: 'dni' },
+                { text: 'Nombre', value: 'name' },
+                { text: 'Apellidos', value: 'surname' },
+                { text: 'Correo electrónico', value: 'email' },
+                { text: 'Teléfono', value: 'phone' }
+            ],
+            search: ''
+        }        
+    },
+    mounted() {
+        customersRef.get()
+            .then(snapshot => {
+                snapshot.forEach(doc => {
+                    this.customers.push(doc.data())
+                })
+            })
+            .catch(err => {
+                console.log('Error getting documents', err)
+            })
     }
 }
 </script>
-
-<style>
-#customers {
-    display: flex;
-}
-Navigation {
-    display: flex;
-}
-</style>

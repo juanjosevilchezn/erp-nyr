@@ -4,6 +4,7 @@ import firebase from 'firebase'
 import Login from '../components/site/login/Login'
 import Home from '../components/site/home/Home'
 import Customers from '../components/site/customers/Customers'
+import CustomerCreate from '../components/site/customers/CustomerCreate'
 
 Vue.use(Router)
 
@@ -34,6 +35,14 @@ let router = new Router({
       path: '/customers',
       name: 'Customers',
       component: Customers,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/customers/create',
+      name: 'Customer create',
+      component: CustomerCreate,
       meta: {
         requiresAuth: true
       }

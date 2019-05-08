@@ -1,9 +1,10 @@
 <template>
   <div id="home">
-    <Navigation/>
+    <Navigation app_part="Inicio"/>
+
     <v-content>
-      <router-view></router-view>
-    </v-content>    
+      
+    </v-content>
   </div>
 </template>
 

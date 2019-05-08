@@ -1,6 +1,6 @@
 <template>
     <div id="navigation">
-      <v-navigation-drawer :clipped="clipped" v-model="drawer" enable-resize-watcher app dark class="primary lighten-3">
+      <v-navigation-drawer v-model="drawer" temporary app>
         <v-list>
           <v-list-tile
             v-for="option in options"
@@ -8,7 +8,7 @@
             :to="option.url"
           >
             <v-list-tile-action>
-              <v-icon color="white">{{option.icon}}</v-icon>
+              <v-icon color="primary">{{option.icon}}</v-icon>
             </v-list-tile-action>
 
             <v-list-tile-content>
@@ -18,9 +18,9 @@
         </v-list>
       </v-navigation-drawer>
 
-      <v-toolbar fixed app :clipped-left="clipped">
+      <v-toolbar fixed dark app color="primary">
         <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-        <v-toolbar-title>{{ company_name }} &bull; Panel de administración</v-toolbar-title>
+        <v-toolbar-title>{{ company_name }} &bull; {{ app_part }}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn
           @click="logout" 
@@ -38,7 +38,6 @@
     name: 'Navigation',    
     data() {
       return {
-        clipped: false,
         company_name: 'N&R',
         drawer: false,
         options: [
@@ -82,6 +81,9 @@
           .signOut()
           .then(() => this.$router.replace('login'))
       }
+    },
+    props: {
+      app_part: String
     }
   }
 </script>
