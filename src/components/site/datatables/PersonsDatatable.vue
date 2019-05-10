@@ -76,7 +76,9 @@
             deletePerson(person) {
                 personsRef.doc(person.id).delete()
                     .then(() => {
-                        this.persons.splice(person.index, 1)
+                        let index = this.persons.map(item => item.id).indexOf(person.id)
+
+                        this.persons.splice(index, 1)
                     })                
             },
             goToEdit(customerId) {

@@ -74,7 +74,9 @@
             deleteCompany(company) {
                 companiesRef.doc(company.id).delete()
                     .then(() => {
-                        this.companies.splice(company.index, 1)
+                        let index = this.companies.map(item => item.id).indexOf(company.id)
+
+                        this.companies.splice(index, 1)
                     })                
             },
             goToEdit(customerId) {
