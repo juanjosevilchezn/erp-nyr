@@ -5,6 +5,7 @@ import Login from '../components/site/login/Login'
 import Home from '../components/site/home/Home'
 import Customers from '../components/site/customers/Customers'
 import CustomerCreate from '../components/site/customers/CustomerCreate'
+import CustomerEdit from '../components/site/customers/CustomerEdit'
 
 Vue.use(Router)
 
@@ -41,8 +42,16 @@ let router = new Router({
     },
     {
       path: '/customers/create',
-      name: 'Customer create',
+      name: 'CustomerCreate',
       component: CustomerCreate,
+      meta: {
+        requiresAuth: true
+      }
+    },    
+    {
+      path: '/customers/edit/:id',
+      name: 'CustomerEdit',
+      component: CustomerEdit,
       meta: {
         requiresAuth: true
       }

@@ -1,6 +1,6 @@
 <template>
     <div id="customersCreate">
-        <Navigation app_part="Crear cliente"/>
+        <Navigation app_part="Editar cliente"/>
 
         <v-container fluid fill-height>
             <v-layout row wrap style="width: 97.5%;">
@@ -150,7 +150,7 @@
                         <v-btn
                             block
                             color="success"
-                            @click="saveCustomer">
+                            @click="updateCustomer">
                             <v-icon>done</v-icon><span>&nbsp; Guardar datos</span>
                         </v-btn>
                     </v-flex>
@@ -161,94 +161,130 @@
 </template>
 
 <script>
-    /* eslint-disable */
+/* eslint-disable */
 
-    import firebase from 'firebase'
-    import Navigation from '../navigation/Navigation'
+import firebase from 'firebase'
+import Navigation from '../navigation/Navigation'
 
-    const db = firebase.firestore()
-    let customersRef = db.collection('customers')
+const db = firebase.firestore()
+let customersRef = db.collection('customers')
 
-    export default {    
-        name: 'CreateCustomer',
-        components: {
-            Navigation
-        },
-        data() {
-            return {
-                customerType: 'person',
-                companyName: '',
-                personName: '',
-                personSurname: '',
-                cif: '',
-                nif: '',
-                phone: '',
-                address: {
-                    homeAddress: '',
-                    locality: '',
-                    province: '',
-                    country: '',
-                },            
-                email: '',
-                createdAt: '',
-                updatedAt: '',
-                countries: [],
-                localities: [],
-                provinces: []
-            }
-        },
-        methods: {
-            saveCustomer() {
-                switch(this.customerType) {
-                    case 'company':
-                        this.saveCompany()
-                        break
-                    case 'person':
-                        this.savePerson()
-                        break
-                }
-            },
-            saveCompany() {
-                let data = {
-                    type: this.customerType,
-                    name: this.companyName,
-                    cif: this.cif,
-                    phone: this.phone,
-                    address: this.address,
-                    email: this.email,
-                    createdAt: new Date(),
-                    updatedAt: new Date()
-                }
-
-                customersRef.doc().set(data)
-                    .then(function() {
-                        // active success alert component
-                    })
-                    .catch(function() {
-                        // active error alert component
-                    })
-            },
-            savePerson() {
-                let data = {
-                    type: this.customerType,
-                    name: this.personName,
-                    surname: this.personSurname,
-                    nif: this.nif,
-                    phone: this.phone,
-                    address: this.address,
-                    email: this.email,
-                    createdAt: new Date(),
-                    updatedAt: new Date()                
-                }
-
-                customersRef.doc().set(data)
-                    .then(function() {
-                        // active success alert component
-                    })
-                    .catch(function() {
-                        // active error alert component
-                    })
-            }
+export default {    
+    name: 'CreateCustomer',
+    components: {
+        Navigation
+    },
+    data() {
+        return {
+            customerType: 'person',
+            companyName: '',
+            personName: '',
+            personSurname: '',
+            cif: '',
+            nif: '',
+            phone: '',
+            address: {
+                homeAddress: '',
+                locality: '',
+                province: '',
+                country: '',
+            },            
+            email: '',
+            createdAt: '',
+            updatedAt: '',
+            countries: [],
+            localities: [],
+            provinces: []
         }
+    },
+    methods: {
+        fillCompany(company) {
+            this.customerType = 'company'
+            this.companyName = company.name
+            this.cif = company.cif
+            this.phone = company.phone
+            this.address.homeAddress = company.address.homeAddress
+            this.address.locality = company.address.locality
+            this.address.province = company.address.province
+            this.address.country = company.address.country        
+            this.email = company.email
+        },
+        fillPerson(person) {
+            this.customerType = 'person'
+            this.personName = person.name
+            this.personSurname = person.surname
+            this.nif = person.nif
+            this.phone = person.phone
+            this.address.homeAddress = person.address.homeAddress
+            this.address.locality = person.address.locality
+            this.address.province = person.address.province
+            this.address.country = person.address.country        
+            this.email = person.email
+        },
+        updateCustomer() {
+            switch(this.customerType) {
+                case 'company':
+                    this.updateCompany()
+                    break;
+                case 'person':
+                    this.updatePerson()
+                    break;
+            }
+        },
+        updateCompany() {
+            let data = {
+                type: this.customerType,
+                name: this.companyName,
+                cif: this.cif,
+                phone: this.phone,
+                address: this.address,
+                email: this.email,
+                updatedAt: new Date()
+            }
+
+            customersRef.doc(this.$route.params.id).update(data)
+                .then(function() {
+                    // active success alert component
+                })
+                .catch(function() {
+                    // active error alert component
+                })
+        },
+        updatePerson() {
+            let data = {
+                type: this.customerType,
+                name: this.personName,
+                surname: this.personSurname,
+                nif: this.nif,
+                phone: this.phone,
+                address: this.address,
+                email: this.email,
+                updatedAt: new Date()                
+            }
+
+            customersRef.doc(this.$route.params.id).update(data)
+                .then(function() {
+                    // active success alert component
+                })
+                .catch(function() {
+                    // active error alert component
+                })
+        }
+    },
+    mounted() {
+        customersRef.doc(this.$route.params.id).get()
+            .then(doc => {
+                if (doc.exists) {
+                    switch (doc.data().type) {
+                        case 'company':
+                            this.fillCompany(doc.data())
+                            break
+                        case 'person':
+                            this.fillPerson(doc.data())
+                            break
+                    }
+                }
+            })
     }
+}
 </script>
