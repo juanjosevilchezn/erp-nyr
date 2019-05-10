@@ -10,6 +10,7 @@
           :rules="emailRules"
           label="E-mail"
           prepend-icon="email"
+          @keyup.enter="login"
           outline
           required
         />
@@ -22,6 +23,7 @@
           label="Contraseña"
           prepend-icon="lock"
           @click:append="showPassword = !showPassword"
+          @keyup.enter="login"
           outline
           required
         />       
@@ -30,9 +32,8 @@
           <v-btn
             :disabled="!valid"
             color="primary"
-            @click="login"
-            
-          >Iniciar sesión</v-btn>
+            @click="login">
+            Iniciar sesión</v-btn>
         </v-flex>
       </v-form>
 
