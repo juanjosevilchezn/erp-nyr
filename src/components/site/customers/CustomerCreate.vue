@@ -1,6 +1,6 @@
 <template>
     <div id="customersCreate">
-        <Navigation app_part="Crear cliente"/>
+        <Navigation :app_part="title"/>
 
         <v-container fluid fill-height>
             <v-layout row wrap style="width: 97.5%;">
@@ -38,7 +38,7 @@
                                     <v-flex xs6 pr-2>
                                         <v-text-field
                                             v-model="personName"
-                                            :rules="regularStringRules"
+                                            :rules="nameRules"
                                             label="Nombre"
                                             outline
                                             required>
@@ -47,7 +47,7 @@
                                     <v-flex xs6 pl-2>
                                         <v-text-field
                                             v-model="personSurname"
-                                            :rules="regularStringRules"
+                                            :rules="surnameRules"
                                             label="Apellidos"
                                             outline
                                             required>
@@ -58,7 +58,7 @@
                                     <v-flex xs12 pr-2>
                                         <v-text-field
                                             v-model="companyName"
-                                            :rules="regularStringRules"
+                                            :rules="nameRules"
                                             label="Nombre de la empresa"
                                             outline
                                             required>
@@ -69,7 +69,6 @@
                                     <v-flex xs6 pr-2 v-if="customerType == 'person'">
                                         <v-text-field
                                             v-model="nif"
-                                            :rules="nifRules"
                                             label="NIF"
                                             outline>
                                         </v-text-field>
@@ -84,6 +83,7 @@
                                     <v-flex xs6 pl-2>
                                         <v-text-field
                                             v-model="phone"
+                                            type="number"
                                             :rules="phoneRules"
                                             label="Número de teléfono"
                                             outline
@@ -136,24 +136,24 @@
                                     <v-flex xs12>
                                         <v-text-field
                                             v-model="email"
-                                            :rules="emailRules"
                                             label="Dirección de correo electrónico"
                                             outline>
                                         </v-text-field>
                                     </v-flex>
                                 </v-layout>
+                                <v-layout row>
+                                    <v-flex xs12>
+                                        <v-btn
+                                            block
+                                            color="success"
+                                            @click="checkForm">
+                                            <v-icon>done</v-icon><span>&nbsp; Guardar datos</span>
+                                        </v-btn>
+                                    </v-flex>
+                                </v-layout>
                             </v-form>
                         </v-card-text>                    
-                    </v-card>
-
-                    <v-flex xs12 mt-3>
-                        <v-btn
-                            block
-                            color="success"
-                            @click="saveCustomer">
-                            <v-icon>done</v-icon><span>&nbsp; Guardar datos</span>
-                        </v-btn>
-                    </v-flex>
+                    </v-card>                    
                 </v-flex>                
             </v-layout>
         </v-container>
@@ -194,11 +194,38 @@
                 updatedAt: '',
                 countries: [],
                 localities: [],
-                provinces: []
+                provinces: [],
+                nameRules: [
+                    v => !!v || 'El nombre es requerido'
+                ],
+                surnameRules: [
+                    v => !!v || 'El apellido es requerido'
+                ],
+                phoneRules: [
+                    v => !!v || 'El número de teléfono es requerido'
+                ],
+                valid: false,
             }
         },
         methods: {
-            saveCustomer() {
+            clearForm() {
+                this.companyName = ''
+                this.personName = ''
+                this.personSurname = ''
+                this.cif = ''
+                this.nif = ''
+                this.phone = ''
+                this.address = []
+                this.email = ''
+            },
+            checkForm() {
+                if (this.$refs.formCustomerCreate.validate()) {
+                    this.saveCustomer()
+                    this.$refs.formCustomerCreate.resetValidation()
+                    this.clearForm()
+                }
+            },
+            saveCustomer() {                
                 switch(this.customerType) {
                     case 'company':
                         this.saveCompany()
@@ -249,6 +276,9 @@
                         // active error alert component
                     })
             }
+        },
+        props: {
+            title: String
         }
     }
 </script>

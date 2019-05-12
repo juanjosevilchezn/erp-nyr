@@ -1,6 +1,6 @@
 <template>
   <div id="home">
-    <Navigation app_part="Inicio"/>
+    <Navigation :app_part="title"/>
 
     <v-content>
       
@@ -15,6 +15,9 @@ export default {
   name: 'Home',
   components: {
     Navigation
+  },
+  props: {
+    title: String
   }
 }
 </script>

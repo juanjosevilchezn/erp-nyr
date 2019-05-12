@@ -17,10 +17,10 @@
             :headers="this.headers"
             :items="this.persons"
             :search="search">
-                <template v-slot:items="props">
-                    <td>{{ props.item.nif }}</td>
+                <template v-slot:items="props">                    
                     <td>{{ props.item.name }}</td>
                     <td>{{ props.item.surname }}</td>
+                    <td>{{ props.item.nif }}</td>
                     <td>{{ props.item.email }}</td>
                     <td>{{ props.item.phone }}</td>
                     <td>
@@ -61,10 +61,10 @@
         data() {
             return {
                 persons: [],
-                headers: [
-                    { text: 'NIF', value: 'nif' },
+                headers: [                    
                     { text: 'Nombre', value: 'name' },
                     { text: 'Apellidos', value: 'surname' },
+                    { text: 'NIF', value: 'nif' },
                     { text: 'Correo electrónico', value: 'email' },
                     { text: 'Teléfono', value: 'phone' },
                     { text: 'Acciones', value: null }

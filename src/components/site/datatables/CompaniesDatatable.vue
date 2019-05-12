@@ -17,9 +17,9 @@
             :headers="this.headers"
             :items="this.companies"
             :search="search">
-                <template v-slot:items="props">
-                    <td>{{ props.item.cif }}</td>
+                <template v-slot:items="props">                    
                     <td>{{ props.item.name }}</td>
+                    <td>{{ props.item.cif }}</td>
                     <td>{{ props.item.email }}</td>
                     <td>{{ props.item.phone }}</td>
                     <td>
@@ -60,9 +60,9 @@
         data() {
             return {
                 companies: [],
-                headers: [
-                    { text: 'CIF', value: 'cif' },
+                headers: [                    
                     { text: 'Nombre', value: 'name' },
+                    { text: 'CIF', value: 'cif' },
                     { text: 'Correo electrónico', value: 'email' },
                     { text: 'Teléfono', value: 'phone' },
                     { text: 'Acciones', value: null }

@@ -1,6 +1,6 @@
 <template>
     <div id="customers">
-        <Navigation app_part="Clientes"/>
+        <Navigation :app_part="title"/>
 
         <v-container fluid fill-height>
             <v-layout row wrap style="width: 97.5%;">
@@ -40,5 +40,8 @@ export default {
         PersonsDatatable,
         Navigation
     },
+    props: {
+        title: String
+    }
 }
 </script>

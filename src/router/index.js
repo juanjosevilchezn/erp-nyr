@@ -19,10 +19,7 @@ let router = new Router({
     {
       path: '/login',
       name: 'Login',
-      component: Login,
-      props: {
-        title: 'N&R'
-      }
+      component: Login
     },
     {
       path: '/home',
@@ -30,6 +27,9 @@ let router = new Router({
       component: Home,
       meta: {
         requiresAuth: true
+      },
+      props: {
+        title: 'Inicio'
       }
     },
     {
@@ -38,6 +38,9 @@ let router = new Router({
       component: Customers,
       meta: {
         requiresAuth: true
+      },
+      props: {
+        title: 'Clientes'
       }
     },
     {
@@ -46,6 +49,9 @@ let router = new Router({
       component: CustomerCreate,
       meta: {
         requiresAuth: true
+      },
+      props: {
+        title: 'Crear nuevo cliente'
       }
     },    
     {
@@ -54,6 +60,9 @@ let router = new Router({
       component: CustomerEdit,
       meta: {
         requiresAuth: true
+      },
+      props: {
+        title: 'Editar cliente'
       }
     }
   ]

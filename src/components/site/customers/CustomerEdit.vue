@@ -1,6 +1,6 @@
 <template>
     <div id="customersCreate">
-        <Navigation app_part="Editar cliente"/>
+        <Navigation :app_part="title"/>
 
         <v-container fluid fill-height>
             <v-layout row wrap style="width: 97.5%;">
@@ -23,7 +23,7 @@
                             <h2 style="color: grey;">Datos del cliente</h2>
                             
                             <v-form
-                                ref="formCustomerCreate"
+                                ref="formCustomerEdit"
                                 v-model="valid"
                                 lazy-validation>
                                 <v-layout row>
@@ -38,7 +38,7 @@
                                     <v-flex xs6 pr-2>
                                         <v-text-field
                                             v-model="personName"
-                                            :rules="regularStringRules"
+                                            :rules="nameRules"
                                             label="Nombre"
                                             outline
                                             required>
@@ -47,7 +47,7 @@
                                     <v-flex xs6 pl-2>
                                         <v-text-field
                                             v-model="personSurname"
-                                            :rules="regularStringRules"
+                                            :rules="surnameRules"
                                             label="Apellidos"
                                             outline
                                             required>
@@ -58,7 +58,7 @@
                                     <v-flex xs12 pr-2>
                                         <v-text-field
                                             v-model="companyName"
-                                            :rules="regularStringRules"
+                                            :rules="nameRules"
                                             label="Nombre de la empresa"
                                             outline
                                             required>
@@ -69,7 +69,6 @@
                                     <v-flex xs6 pr-2 v-if="customerType == 'person'">
                                         <v-text-field
                                             v-model="nif"
-                                            :rules="nifRules"
                                             label="NIF"
                                             outline>
                                         </v-text-field>
@@ -136,24 +135,24 @@
                                     <v-flex xs12>
                                         <v-text-field
                                             v-model="email"
-                                            :rules="emailRules"
                                             label="Dirección de correo electrónico"
                                             outline>
                                         </v-text-field>
                                     </v-flex>
                                 </v-layout>
+                                <v-layout row>
+                                    <v-flex xs12 mt-3>
+                                        <v-btn
+                                            block
+                                            color="success"
+                                            @click="checkForm">
+                                            <v-icon>done</v-icon><span>&nbsp; Guardar datos</span>
+                                        </v-btn>
+                                    </v-flex>
+                                </v-layout>
                             </v-form>
                         </v-card-text>                    
-                    </v-card>
-
-                    <v-flex xs12 mt-3>
-                        <v-btn
-                            block
-                            color="success"
-                            @click="updateCustomer">
-                            <v-icon>done</v-icon><span>&nbsp; Guardar datos</span>
-                        </v-btn>
-                    </v-flex>
+                    </v-card>                    
                 </v-flex>                
             </v-layout>
         </v-container>
@@ -194,10 +193,26 @@ export default {
             updatedAt: '',
             countries: [],
             localities: [],
-            provinces: []
+            provinces: [],
+            nameRules: [
+                    v => !!v || 'El nombre es requerido'
+                ],
+                surnameRules: [
+                    v => !!v || 'El apellido es requerido'
+                ],
+                phoneRules: [
+                    v => !!v || 'El número de teléfono es requerido'
+                ],
+                valid: false,
         }
     },
     methods: {
+        checkForm() {
+            if (this.$refs.formCustomerEdit.validate()) {
+                this.updateCustomer()
+                this.$refs.formCustomerEdit.resetValidation()
+            }
+        },
         fillCompany(company) {
             this.customerType = 'company'
             this.companyName = company.name
@@ -285,6 +300,9 @@ export default {
                     }
                 }
             })
+    },
+    props: {
+        title: String
     }
 }
 </script>
