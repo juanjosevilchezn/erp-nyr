@@ -1,5 +1,5 @@
 <template>
-    <div id="companiesDatatable">        
+    <div id="tasksDatatable">        
         <v-card>
             <v-card-title>
                 <h4>{{ this.title }}</h4>
@@ -15,13 +15,14 @@
             
             <v-data-table
             :headers="this.headers"
-            :items="this.companies"
+            :items="this.tasks"
             :search="search">
                 <template v-slot:items="props">                    
-                    <td>{{ props.item.name }}</td>
-                    <td>{{ props.item.cif }}</td>
-                    <td>{{ props.item.email }}</td>
-                    <td>{{ props.item.phone }}</td>
+                    <td>{{ props.item.description }}</td>
+                    <td>{{ props.item.type }}</td>
+                    <td>{{ props.item.price }}</td>
+                    <td>{{ props.item.state }}</td>
+                    <td>{{ props.item.deliveryDate }}</td>
                     <td>
                         <v-btn 
                             flat
@@ -40,7 +41,7 @@
                             flat
                             icon
                             color="red"
-                            @click="deleteCompany(props.item)">
+                            @click="deleteTask(props.item)">
                             <v-icon>delete</v-icon>
                         </v-btn>
                     </td>
@@ -59,53 +60,55 @@
     import firebase from 'firebase'
 
     const db = firebase.firestore()
-    let companiesRef = db.collection('customers')
+    let tasksRef = db.collection('tasks')
 
     export default {    
-        name: 'CompaniesDatatable',
+        name: 'TasksDatatable',
         data() {
             return {
-                companies: [],
+                tasks: [],
                 headers: [                    
-                    { text: 'Nombre', value: 'name' },
-                    { text: 'CIF', value: 'cif' },
-                    { text: 'Correo electrónico', value: 'email' },
-                    { text: 'Teléfono', value: 'phone' },
+                    { text: 'Descripción', value: 'description' },
+                    { text: 'Tipo', value: 'type' },
+                    { text: 'Precio', value: 'price' },
+                    { text: 'Estado', value: 'state' },
+                    { text: 'Fecha de entrega', value: 'deliveryDate' },                    
                     { text: 'Acciones', value: null }
                 ],
-                search: ''                
+                search: ''
             }
         },
         methods: {
-            deleteCompany(company) {
-                companiesRef.doc(company.id).delete()
+            deleteTask(task) {
+                tasksRef.doc(task.id).delete()
                     .then(() => {
-                        let index = this.companies.map(item => item.id).indexOf(company.id)
+                        let index = this.tasks.map(item => item.id).indexOf(task.id)
 
-                        this.companies.splice(index, 1)
+                        this.tasks.splice(index, 1)
                     })                
             },
-            goToEdit(customerId) {
+            goToEdit(taskId) {
                 this.$router.push(
                     { 
-                        name: 'CustomerEdit', 
+                        name: 'TaskEdit', 
                         params: { 
-                            id:  customerId
+                            id:  taskId
                         } 
                     })
             }
         },
         mounted() {
-            companiesRef.get()
+            tasksRef.get()
                 .then(snapshot => {
                     snapshot.forEach(doc => {
-                        if (doc.data().type == 'company') {
-                            this.companies.push({
-                                id: doc.id,
-                                ...doc.data()
-                            })
-                        }
+                        this.tasks.push({
+                            id: doc.id,
+                            ...doc.data()
+                        })                        
                     })
+                })
+                .finally(() => {
+                    firebase.database().goOffline()
                 })
         },
         props: {

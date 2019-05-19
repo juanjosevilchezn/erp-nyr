@@ -27,6 +27,12 @@
                         <v-btn 
                             flat
                             icon
+                            color="primary">
+                            <v-icon>remove_red_eye</v-icon>
+                        </v-btn>
+                        <v-btn 
+                            flat
+                            icon
                             color="yellow darken-2"
                             @click="goToEdit(props.item.id)">
                             <v-icon>edit</v-icon>

@@ -2,7 +2,7 @@
     <div id="customersCreate">
         <Navigation :app_part="title"/>
 
-        <v-container fluid fill-height>
+        <v-container fluid>
             <v-layout row wrap style="width: 97.5%;">
                 <v-flex xs2>
                     <v-btn
@@ -170,7 +170,7 @@
     let customersRef = db.collection('customers')
 
     export default {    
-        name: 'CreateCustomer',
+        name: 'CustomerCreate',
         components: {
             Navigation
         },
@@ -202,7 +202,8 @@
                     v => !!v || 'El apellido es requerido'
                 ],
                 phoneRules: [
-                    v => !!v || 'El número de teléfono es requerido'
+                    v => !!v || 'El número de teléfono es requerido',
+                    (v) => v && v.length <= 10 || 'El número de teléfono debe tener menos de 10 dígitos'
                 ],
                 valid: false,
             }

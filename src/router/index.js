@@ -6,6 +6,9 @@ import Home from '../components/site/home/Home'
 import Customers from '../components/site/customers/Customers'
 import CustomerCreate from '../components/site/customers/CustomerCreate'
 import CustomerEdit from '../components/site/customers/CustomerEdit'
+import Tasks from '../components/site/tasks/Tasks'
+import TaskCreate from '../components/site/tasks/TaskCreate'
+import TaskEdit from '../components/site/tasks/TaskEdit'
 
 Vue.use(Router)
 
@@ -63,6 +66,39 @@ let router = new Router({
       },
       props: {
         title: 'Editar cliente'
+      }
+    },
+    {
+      path: '/tasks',
+      name: 'Tasks',
+      component: Tasks,
+      meta: {
+        requiresAuth: true
+      },
+      props: {
+        title: 'Tareas'
+      }
+    },
+    {
+      path: '/tasks/create',
+      name: 'TaskCreate',
+      component: TaskCreate,
+      meta: {
+        requiresAuth: true
+      },
+      props: {
+        title: 'Crear nueva tarea'
+      }
+    },
+    {
+      path: '/tasks/edit/:id',
+      name: 'TaskEdit',
+      component: TaskEdit,
+      meta: {
+        requiresAuth: true
+      },
+      props: {
+        title: 'Editar tarea'
       }
     }
   ]

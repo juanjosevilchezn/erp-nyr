@@ -1,8 +1,8 @@
 <template>
-    <div id="customersCreate">
+    <div id="customersEdit">
         <Navigation :app_part="title"/>
 
-        <v-container fluid fill-height>
+        <v-container fluid>
             <v-layout row wrap style="width: 97.5%;">
                 <v-flex xs2>
                     <v-btn
@@ -195,15 +195,16 @@ export default {
             localities: [],
             provinces: [],
             nameRules: [
-                    v => !!v || 'El nombre es requerido'
-                ],
-                surnameRules: [
-                    v => !!v || 'El apellido es requerido'
-                ],
-                phoneRules: [
-                    v => !!v || 'El número de teléfono es requerido'
-                ],
-                valid: false,
+                v => !!v || 'El nombre es requerido'
+            ],
+            surnameRules: [
+                v => !!v || 'El apellido es requerido'
+            ],
+            phoneRules: [
+                v => !!v || 'El número de teléfono es requerido',
+                (v) => v && v.length <= 10 || 'El número de teléfono debe tener menos de 10 dígitos'
+            ],
+            valid: false,
         }
     },
     methods: {
@@ -264,6 +265,9 @@ export default {
                 .catch(function() {
                     // active error alert component
                 })
+                .finally(() => {
+                    firebase.database().goOffline()
+                }) 
         },
         updatePerson() {
             let data = {
@@ -284,6 +288,9 @@ export default {
                 .catch(function() {
                     // active error alert component
                 })
+                .finally(() => {
+                    firebase.database().goOffline()
+                }) 
         }
     },
     mounted() {
@@ -300,6 +307,12 @@ export default {
                     }
                 }
             })
+            .catch(function() {
+                // send to error page
+            })
+            .finally(() => {
+                firebase.database().goOffline()
+            }) 
     },
     props: {
         title: String

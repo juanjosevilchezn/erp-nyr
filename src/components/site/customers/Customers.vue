@@ -2,7 +2,7 @@
     <div id="customers">
         <Navigation :app_part="title"/>
 
-        <v-container fluid fill-height>
+        <v-container fluid>
             <v-layout row wrap style="width: 97.5%;">
                 <v-flex xs2>
                     <v-btn
