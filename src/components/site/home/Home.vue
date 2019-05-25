@@ -2,9 +2,11 @@
   <div id="home">
     <Navigation :app_part="title"/>
 
-    <v-content>
-      
-    </v-content>
+    <v-container fluid>
+      <v-layout row fill-width>
+        <!-- TO-DO CALENDAR PREVIEW AND NEAR FINISH TASKS LIST -->
+      </v-layout>
+    </v-container>
   </div>
 </template>
 

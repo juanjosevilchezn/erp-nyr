@@ -3,7 +3,7 @@
         <Navigation :app_part="title"/>
 
         <v-container fluid>
-            <v-layout row wrap style="width: 97.5%;">
+            <v-layout row wrap fill-width>
                 <v-flex xs2>
                     <v-btn
                         block
@@ -29,8 +29,8 @@
 
 <script>
 /* eslint-disable */
-import CompaniesDatatable from '../datatables/CompaniesDatatable'
-import PersonsDatatable from '../datatables/PersonsDatatable'
+import CompaniesDatatable from '../../datatables/CompaniesDatatable'
+import PersonsDatatable from '../../datatables/PersonsDatatable'
 import Navigation from '../navigation/Navigation'
 
 export default {    

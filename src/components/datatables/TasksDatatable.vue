@@ -17,11 +17,35 @@
             :headers="this.headers"
             :items="this.tasks"
             :search="search">
-                <template v-slot:items="props">                    
-                    <td>{{ props.item.description }}</td>
-                    <td>{{ props.item.type }}</td>
+                <template v-slot:items="props">
+                    <td>{{ props.item.customerData.name }} {{ props.item.customerData.surname }}</td>                    
+                    <td>{{ props.item.description }}</td>                    
                     <td>{{ props.item.price }}</td>
-                    <td>{{ props.item.state }}</td>
+                    <td>
+                        <v-chip color="orange" text-color="white" v-if="props.item.type == 'arrangement'" disabled>
+                            Arreglo                            
+                        </v-chip>
+                        <v-chip color="indigo" text-color="white" v-if="props.item.type == 'manufacture'" disabled>
+                            Confección                            
+                        </v-chip>
+                    </td>
+                    <td>
+                        <v-chip color="#70ddff" text-color="black" v-if="props.item.state == 'Presupuestado'" disabled>
+                            Presupuestado                            
+                        </v-chip>
+                        <v-chip color="teal lighten-4" text-color="black" v-if="props.item.state == 'Confirmado'" disabled>
+                            Confirmado                            
+                        </v-chip>
+                        <v-chip color="green accent-3" text-color="black" v-if="props.item.state == 'Finalizado'" disabled>
+                            Finalizado                            
+                        </v-chip>
+                        <v-chip color="lime lighten-1" text-color="black" v-if="props.item.state == 'Albaranado'" disabled>
+                            Albaranado                            
+                        </v-chip>
+                        <v-chip color="brown lighten-4" text-color="black" v-if="props.item.state == 'Facturado'" disabled>
+                            Facturado
+                        </v-chip>
+                    </td>
                     <td>{{ props.item.deliveryDate }}</td>
                     <td>
                         <v-btn 
@@ -34,14 +58,16 @@
                             flat
                             icon
                             color="yellow darken-2"
-                            @click="goToEdit(props.item.id)">
+                            @click="goToEdit(props.item.id)"
+                            v-if="props.item.state != 'Albaranado' && props.item.state != 'Facturado'">
                             <v-icon>edit</v-icon>
                         </v-btn>
                         <v-btn 
                             flat
                             icon
                             color="red"
-                            @click="deleteTask(props.item)">
+                            @click="deleteTask(props.item)"
+                            v-if="props.item.state != 'Albaranado' && props.item.state != 'Facturado'">
                             <v-icon>delete</v-icon>
                         </v-btn>
                     </td>
@@ -67,13 +93,14 @@
         data() {
             return {
                 tasks: [],
-                headers: [                    
+                headers: [
+                    { text: 'Cliente', value: 'customerData.name' },        
                     { text: 'Descripción', value: 'description' },
-                    { text: 'Tipo', value: 'type' },
                     { text: 'Precio', value: 'price' },
+                    { text: 'Tipo', value: 'type' },
                     { text: 'Estado', value: 'state' },
-                    { text: 'Fecha de entrega', value: 'deliveryDate' },                    
-                    { text: 'Acciones', value: null }
+                    { text: 'Fecha de entrega', value: 'deliveryDate' },
+                    { text: 'Acciones', value: null, sortable: false }
                 ],
                 search: ''
             }
@@ -101,11 +128,20 @@
             tasksRef.get()
                 .then(snapshot => {
                     snapshot.forEach(doc => {
-                        this.tasks.push({
-                            id: doc.id,
-                            ...doc.data()
-                        })                        
+                        let taskData = doc.data()
+
+                        taskData.customer.get()
+                            .then(res => {
+                                taskData.customerData = res.data()
+                                this.tasks.push({
+                                    id: doc.id,
+                                    ...taskData
+                                })
+                            })
                     })
+                })
+                .catch(error => {
+
                 })
                 .finally(() => {
                     firebase.database().goOffline()

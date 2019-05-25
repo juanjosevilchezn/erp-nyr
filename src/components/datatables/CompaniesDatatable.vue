@@ -1,5 +1,5 @@
 <template>
-    <div id="personsDatatable">        
+    <div id="companiesDatatable">        
         <v-card>
             <v-card-title>
                 <h4>{{ this.title }}</h4>
@@ -15,12 +15,11 @@
             
             <v-data-table
             :headers="this.headers"
-            :items="this.persons"
+            :items="this.companies"
             :search="search">
                 <template v-slot:items="props">                    
                     <td>{{ props.item.name }}</td>
-                    <td>{{ props.item.surname }}</td>
-                    <td>{{ props.item.nif }}</td>
+                    <td>{{ props.item.cif }}</td>
                     <td>{{ props.item.email }}</td>
                     <td>{{ props.item.phone }}</td>
                     <td>
@@ -41,7 +40,7 @@
                             flat
                             icon
                             color="red"
-                            @click="deletePerson(props.item)">
+                            @click="deleteCompany(props.item)">
                             <v-icon>delete</v-icon>
                         </v-btn>
                     </td>
@@ -60,31 +59,30 @@
     import firebase from 'firebase'
 
     const db = firebase.firestore()
-    let personsRef = db.collection('customers')
+    let companiesRef = db.collection('customers')
 
     export default {    
-        name: 'PersonsDatatable',
+        name: 'CompaniesDatatable',
         data() {
             return {
-                persons: [],
+                companies: [],
                 headers: [                    
                     { text: 'Nombre', value: 'name' },
-                    { text: 'Apellidos', value: 'surname' },
-                    { text: 'NIF', value: 'nif' },
+                    { text: 'CIF', value: 'cif' },
                     { text: 'Correo electrónico', value: 'email' },
                     { text: 'Teléfono', value: 'phone' },
-                    { text: 'Acciones', value: null }
+                    { text: 'Acciones', value: null, sortable: false }
                 ],
-                search: ''
+                search: ''                
             }
         },
         methods: {
-            deletePerson(person) {
-                personsRef.doc(person.id).delete()
+            deleteCompany(company) {
+                companiesRef.doc(company.id).delete()
                     .then(() => {
-                        let index = this.persons.map(item => item.id).indexOf(person.id)
+                        let index = this.companies.map(item => item.id).indexOf(company.id)
 
-                        this.persons.splice(index, 1)
+                        this.companies.splice(index, 1)
                     })                
             },
             goToEdit(customerId) {
@@ -98,11 +96,11 @@
             }
         },
         mounted() {
-            personsRef.get()
+            companiesRef.get()
                 .then(snapshot => {
                     snapshot.forEach(doc => {
-                        if (doc.data().type == 'person') {
-                            this.persons.push({
+                        if (doc.data().type == 'company') {
+                            this.companies.push({
                                 id: doc.id,
                                 ...doc.data()
                             })

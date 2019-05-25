@@ -9,6 +9,9 @@ import CustomerEdit from '../components/site/customers/CustomerEdit'
 import Tasks from '../components/site/tasks/Tasks'
 import TaskCreate from '../components/site/tasks/TaskCreate'
 import TaskEdit from '../components/site/tasks/TaskEdit'
+import Billing from '../components/site/billing/Billing'
+import DeliveryNoteCreate from '../components/site/billing/deliveryNotes/DeliveryNoteCreate'
+import InvoiceCreate from '../components/site/billing/invoices/InvoiceCreate'
 
 Vue.use(Router)
 
@@ -99,6 +102,39 @@ let router = new Router({
       },
       props: {
         title: 'Editar tarea'
+      }
+    },
+    {
+      path: '/billing',
+      name: 'Billing',
+      component: Billing,
+      meta: {
+        requiresAuth: true
+      },
+      props: {
+        title: 'Facturación'
+      }
+    },    
+    {
+      path: '/billing/createDeliveryNote',
+      name: 'DeliveryNoteCreate',
+      component: DeliveryNoteCreate,
+      meta: {
+        requiresAuth: true
+      },
+      props: {
+        title: 'Albaranar tareas'
+      }
+    },
+    {
+      path: '/billing/createInvoice',
+      name: 'InvoiceCreate',
+      component: InvoiceCreate,
+      meta: {
+        requiresAuth: true
+      },
+      props: {
+        title: 'Facturar tareas'
       }
     }
   ]

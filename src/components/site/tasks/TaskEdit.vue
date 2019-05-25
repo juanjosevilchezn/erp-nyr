@@ -3,7 +3,7 @@
         <Navigation :app_part="title"/>
 
         <v-container fluid>
-            <v-layout row wrap style="width: 97.5%;">
+            <v-layout row wrap fill-width>
                 <v-flex xs2>
                     <v-btn
                         block
@@ -61,7 +61,7 @@
                                     <v-flex xs8 pr-2>
                                         <v-overflow-btn
                                             :items="customers"
-                                            v-model="customerId"
+                                            v-model="customerData.id"
                                             label="Cliente"
                                             :rules="requiredStringRule"
                                             item-value="id"
@@ -424,7 +424,6 @@
     const db = firebase.firestore()
     let customersRef = db.collection('customers')
     let tasksRef = db.collection('tasks')
-    let statesRef = db.collection('task_states')
 
     export default {    
         name: 'TaskCreate',
@@ -434,7 +433,8 @@
         data() {
             return {
                 type: 'arrangement',
-                customerId: '',
+                customer: '',
+                customerData: {},
                 description: '',
                 price: 0,                
                 quantity: 1,
@@ -470,7 +470,7 @@
                 },
                 state: '',             
                 customers: [],
-                states: [],
+                states: ['Presupuestado', 'Confirmado', 'Finalizado'],
                 requiredStringRule: [
                     v => !!v || 'Este campo es requerido'
                 ],
@@ -491,13 +491,14 @@
                 }
             },            
             fillTask(task) {
+                this.type = task.type
                 this.description = task.description
                 this.state = task.state
                 this.price = task.price
                 this.quantity = task.quantity
                 this.extra = task.extra
                 this.deliveryDate = task.deliveryDate
-                this.customerId = task.customerId
+                this.customerData.id = task.customerData.id
                 this.notes = task.notes
                 this.measures = task.measures
             },
@@ -505,7 +506,7 @@
             updateTask() {                
                 let data = {
                     type: this.type,
-                    customerId: this.customerId,
+                    customer: db.doc('/customers/' + this.customerData.id),
                     description: this.description,
                     price: this.price,
                     quantity: this.quantity,
@@ -540,20 +541,18 @@
                     // send to error page
                 })
 
-            statesRef.get()
-                .then(snapshot => {
-                    snapshot.forEach(doc => {
-                        this.states.push(doc.data())
-                    })
-                })
-                .catch(function(error) {
-                    // send to error page
-                    console.log(error)
-                })
-
             tasksRef.doc(this.$route.params.id).get()
                 .then(doc => {
-                    this.fillTask(doc.data())
+                    let taskData = doc.data()
+
+                    taskData.customer.get()
+                        .then(res => {
+                            taskData.customerData = {
+                                id: res.id,
+                                ...res.data()
+                            }
+                            this.fillTask(taskData)
+                        })
                 })
                 .catch(function() {
                     // send to error page
