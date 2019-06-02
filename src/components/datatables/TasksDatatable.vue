@@ -39,8 +39,8 @@
                         <v-chip color="green accent-3" text-color="black" v-if="props.item.state == 'Finalizado'" disabled>
                             Finalizado                            
                         </v-chip>
-                        <v-chip color="lime lighten-1" text-color="black" v-if="props.item.state == 'Albaranado'" disabled>
-                            Albaranado                            
+                        <v-chip color="lime lighten-1" text-color="black" v-if="props.item.state == 'Entregado'" disabled>
+                            Entregado                            
                         </v-chip>
                         <v-chip color="brown lighten-4" text-color="black" v-if="props.item.state == 'Facturado'" disabled>
                             Facturado
@@ -59,7 +59,7 @@
                             icon
                             color="yellow darken-2"
                             @click="goToEdit(props.item.id)"
-                            v-if="props.item.state != 'Albaranado' && props.item.state != 'Facturado'">
+                            v-if="props.item.state != 'Entregado' && props.item.state != 'Facturado'">
                             <v-icon>edit</v-icon>
                         </v-btn>
                         <v-btn 
@@ -67,7 +67,7 @@
                             icon
                             color="red"
                             @click="deleteTask(props.item)"
-                            v-if="props.item.state != 'Albaranado' && props.item.state != 'Facturado'">
+                            v-if="props.item.state != 'Entregado' && props.item.state != 'Facturado'">
                             <v-icon>delete</v-icon>
                         </v-btn>
                     </td>

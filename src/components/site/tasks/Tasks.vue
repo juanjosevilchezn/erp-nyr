@@ -16,7 +16,7 @@
 
             <v-layout row fill-width mt-3>
                 <InfoAlert
-                    message="Si la tarea ya ha sido albaranada o facturada, no podrás modificarla ni eliminarla."/>
+                    message="Si la tarea ya ha sido entregada o facturada, no podrás modificarla ni eliminarla."/>
             </v-layout>
 
             <v-layout row fill-width>

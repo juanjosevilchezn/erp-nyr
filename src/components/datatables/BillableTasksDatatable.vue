@@ -78,7 +78,7 @@
                     snapshot.forEach(doc => {
                         let taskData = doc.data()
 
-                        if (doc.data().state == 'Finalizado' || doc.data().state == 'Albaranado') {
+                        if (doc.data().state == 'Finalizado' || doc.data().state == 'Entregado') {
                             taskData.customer.get()
                                 .then(res => {
                                     taskData.customerData = res.data()

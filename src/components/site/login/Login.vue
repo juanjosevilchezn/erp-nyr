@@ -36,10 +36,6 @@
             Iniciar sesión</v-btn>
         </v-flex>
       </v-form>
-
-      <br/>
-
-      <p class="text-xs-center grey--text">Juan José Vílchez Naranjo &copy; 2019</p>
     </div>
 </template>
 

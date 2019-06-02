@@ -10,6 +10,8 @@ import Tasks from '../components/site/tasks/Tasks'
 import TaskCreate from '../components/site/tasks/TaskCreate'
 import TaskEdit from '../components/site/tasks/TaskEdit'
 import Billing from '../components/site/billing/Billing'
+import DeliveryNotePreview from '../components/site/billing/deliveryNotes/DeliveryNotePreview'
+import InvoicePreview from '../components/site/billing/invoices/InvoicePreview'
 import DeliveryNoteCreate from '../components/site/billing/deliveryNotes/DeliveryNoteCreate'
 import InvoiceCreate from '../components/site/billing/invoices/InvoiceCreate'
 
@@ -114,7 +116,23 @@ let router = new Router({
       props: {
         title: 'Facturación'
       }
-    },    
+    },
+    {
+      path: '/billing/deliveryNote/:id',
+      name: 'DeliveryNotePreview',
+      component: DeliveryNotePreview,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/billing/invoice/:id',
+      name: 'InvoicePreview',
+      component: InvoicePreview,
+      meta: {
+        requiresAuth: true
+      }
+    },
     {
       path: '/billing/createDeliveryNote',
       name: 'DeliveryNoteCreate',
