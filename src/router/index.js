@@ -141,7 +141,7 @@ let router = new Router({
         requiresAuth: true
       },
       props: {
-        title: 'Albaranar tareas'
+        title: 'Entregar tareas'
       }
     },
     {

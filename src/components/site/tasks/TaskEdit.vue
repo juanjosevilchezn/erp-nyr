@@ -13,8 +13,10 @@
                     </v-btn>
                 </v-flex>
 
-                <v-flex xs12>
-                    <!-- TO-DO ALERT COMPONENT -->
+                <v-flex xs12 mt-2>
+                    <SuccessAlert
+                        ref="successAlert"
+                        message="La tarea ha sido actualizada con éxito."/>
                 </v-flex>               
 
                 <v-flex xs12 mt-3>
@@ -420,6 +422,7 @@
     import firebase from 'firebase'
     import moment from 'moment'
     import Navigation from '../navigation/Navigation'
+    import SuccessAlert from '../../alerts/SuccessAlert'
 
     const db = firebase.firestore()
     let customersRef = db.collection('customers')
@@ -428,7 +431,8 @@
     export default {    
         name: 'TaskCreate',
         components: {
-            Navigation
+            Navigation,
+            SuccessAlert
         },
         data() {
             return {
@@ -502,7 +506,7 @@
                 this.notes = task.notes
                 this.measures = task.measures
             },
-            getFormattedText: item => item.name + ' ' + item.surname + ' (' + item.phone + ')',            
+            getFormattedText: item => item.type == 'company' ? item.name + ' (' + item.phone + ')' : item.name + ' ' + item.surname + ' (' + item.phone + ')',           
             updateTask() {                
                 let data = {
                     type: this.type,
@@ -519,12 +523,16 @@
                 }
 
                 tasksRef.doc(this.$route.params.id).update(data)
-                    .then(function() {
-                        // active success alert component
+                    .then(() => {
+                        this.$refs.successAlert.isShown = true
                     })
-                    .catch(function() {
+                    .catch(error => {
                         // active error alert component
+                        this.$refs.successAlert.isShown = false
                     })
+                    .finally(() => {
+                        firebase.database().goOffline()
+                    }) 
             },
         },
         mounted() {
@@ -537,8 +545,11 @@
                         })
                     })
                 })
-                .catch(function() {
-                    // send to error page
+                .catch(() => {
+                    // send to error page TO-DO
+                })
+                .finally(() => {
+                    firebase.database().goOffline()
                 })
 
             tasksRef.doc(this.$route.params.id).get()
@@ -554,9 +565,12 @@
                             this.fillTask(taskData)
                         })
                 })
-                .catch(function() {
-                    // send to error page
+                .catch(error => {
+                    // send to error page TO-DO
                 })
+                .finally(() => {
+                    firebase.database().goOffline()
+                })    
         },
         props: {
             title: String

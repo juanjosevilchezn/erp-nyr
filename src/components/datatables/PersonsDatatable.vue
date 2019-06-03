@@ -1,5 +1,8 @@
 <template>
-    <div id="personsDatatable">        
+    <div id="personsDatatable">
+        <DeleteConfirmationDialog
+            ref="personDeleteDialog"/>
+
         <v-card>
             <v-card-title>
                 <h4>{{ this.title }}</h4>
@@ -14,9 +17,10 @@
             </v-card-title>
             
             <v-data-table
-            :headers="this.headers"
-            :items="this.persons"
-            :search="search">
+                :headers="this.headers"
+                :items="this.persons"
+                :search="search"
+                no-data-text="No existen clientes. Deberás crear alguno antes para que aparezcan aquí.">
                 <template v-slot:items="props">                    
                     <td>{{ props.item.name }}</td>
                     <td>{{ props.item.surname }}</td>
@@ -58,12 +62,16 @@
 
 <script>
     import firebase from 'firebase'
+    import DeleteConfirmationDialog from '../dialogs/DeleteConfirmationDialog'
 
     const db = firebase.firestore()
     let personsRef = db.collection('customers')
 
     export default {    
         name: 'PersonsDatatable',
+        components: {
+            DeleteConfirmationDialog
+        },
         data() {
             return {
                 persons: [],
@@ -80,12 +88,28 @@
         },
         methods: {
             deletePerson(person) {
-                personsRef.doc(person.id).delete()
-                    .then(() => {
-                        let index = this.persons.map(item => item.id).indexOf(person.id)
+                const title = '¿Estás segur@ de eliminar este cliente?'
+                const message = 'Este proceso es irreversible y no podrás recuperar los datos borrados. Junto con el cliente se eliminarán ' +
+                                'las tareas, albaranes y facturas del mismo.'
 
-                        this.persons.splice(index, 1)
-                    })                
+                this.$refs.personDeleteDialog.open(title, message)
+                    .then(() => {
+                        personsRef.doc(person.id).delete()
+                            .then(() => {
+                                let index = this.persons.map(item => item.id).indexOf(person.id)
+
+                                this.persons.splice(index, 1)
+                            }) 
+                            .catch((error) => {
+                                // SEND TO ERROR PAGE TO-DO
+                            })
+                            .finally(() => {
+                                firebase.database().goOffline()
+                            })
+                    })
+                    .catch(() => {
+                        // NOTHING HAPPENS
+                    })
             },
             goToEdit(customerId) {
                 this.$router.push(

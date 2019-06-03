@@ -1,6 +1,6 @@
 <template>
     <div id="tasks">
-        <Navigation :app_part="title"/>
+        <Navigation :app_part="title"/>       
 
         <v-container fluid>
             <v-layout row fill-width>

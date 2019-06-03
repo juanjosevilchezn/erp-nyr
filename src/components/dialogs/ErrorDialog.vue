@@ -2,7 +2,7 @@
   <v-layout row justify-center fill-height>
     <v-dialog
       v-model="isShown"
-      max-width="290">
+      max-width="500">
       <v-card>
         <v-card-title class="headline">{{ title }}</v-card-title>
 

@@ -1,25 +1,34 @@
 <template>
   <div id="home">
     <Navigation :app_part="title"/>
-
+    
     <v-container fluid>
       <v-layout row fill-width>
-        <!-- TO-DO CALENDAR PREVIEW AND NEAR FINISH TASKS LIST -->
+        <InfoAlert
+          message='Recuerda que este calendario solo mostrará aquellas tareas que se
+                  encuentren en estado "Confirmado".'/>
+      </v-layout>
+      <v-layout row fill-width>
+        <HomeCalendar/>
       </v-layout>
     </v-container>
   </div>
 </template>
 
 <script>
-import Navigation from '../navigation/Navigation'
+  import HomeCalendar from '../../calendars/HomeCalendar'
+  import InfoAlert from '../../alerts/InfoAlert'
+  import Navigation from '../navigation/Navigation'
 
-export default {
-  name: 'Home',
-  components: {
-    Navigation
-  },
-  props: {
-    title: String
+  export default {
+    name: 'Home',
+    components: {
+      HomeCalendar,
+      InfoAlert,
+      Navigation
+    },
+    props: {
+      title: String
+    }
   }
-}
 </script>

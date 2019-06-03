@@ -38,7 +38,7 @@
                             Confección                            
                         </v-chip>
                     </td>
-                    <td>{{ props.item.deliveryDate }}</td>
+                    <td>{{ props.item.deliveryDate | formatDate }}</td>
                 </template>
                 <template v-slot:no-results>
                     <v-alert :value="true" color="error" icon="warning">
@@ -52,6 +52,7 @@
 
 <script>
     import firebase from 'firebase'
+    import moment from 'moment'
 
     const db = firebase.firestore()
     let tasksRef = db.collection('tasks')
@@ -70,6 +71,11 @@
                     { text: 'Fecha de entrega', value: 'deliveryDate' }
                 ],
                 search: ''
+            }
+        },
+        filters: {
+            formatDate: (date) => {
+                return moment(date).format('DD-MM-YYYY');
             }
         },
         mounted() {

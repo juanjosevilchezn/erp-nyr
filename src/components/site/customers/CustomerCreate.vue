@@ -13,8 +13,10 @@
                     </v-btn>
                 </v-flex>
 
-                <v-flex xs12>
-                    <!-- TO-DO ALERT COMPONENT -->
+                <v-flex xs12 mt-2>
+                    <SuccessAlert
+                        ref="successAlert"
+                        message="El cliente ha sido guardado con éxito."/>
                 </v-flex>               
 
                 <v-flex xs12 mt-3>
@@ -146,7 +148,7 @@
                                         <v-btn
                                             block
                                             color="success"
-                                            @click="checkForm">
+                                            @click.prevent="checkForm">
                                             <v-icon>done</v-icon><span>&nbsp; Guardar datos</span>
                                         </v-btn>
                                     </v-flex>
@@ -161,10 +163,9 @@
 </template>
 
 <script>
-    /* eslint-disable */
-
     import firebase from 'firebase'
     import Navigation from '../navigation/Navigation'
+    import SuccessAlert from '../../alerts/SuccessAlert'
 
     const db = firebase.firestore()
     let customersRef = db.collection('customers')
@@ -172,7 +173,8 @@
     export default {    
         name: 'CustomerCreate',
         components: {
-            Navigation
+            Navigation,
+            SuccessAlert
         },
         data() {
             return {
@@ -249,11 +251,15 @@
                 }
 
                 customersRef.doc().set(data)
-                    .then(function() {
-                        // active success alert component
+                    .then(() => {
+                        this.$refs.successAlert.isShown = true
                     })
-                    .catch(function() {
-                        // active error alert component
+                    .catch(() => {
+                        // active error alert component TO-DO
+                        this.$refs.successAlert.isShown = false
+                    })
+                    .finally(() => {
+                        firebase.database().goOffline()
                     })
             },
             savePerson() {
@@ -270,12 +276,18 @@
                 }
 
                 customersRef.doc().set(data)
-                    .then(function() {
-                        // active success alert component
+                    .then(() => {
+                        this.$refs.successAlert.isShown = true                        
                     })
-                    .catch(function() {
-                        // active error alert component
+                    .catch((error) => {
+                        // active error alert component TO-DO
+                        this.$refs.successAlert.isShown = false
                     })
+                    .finally(() => {
+                        firebase.database().goOffline()
+                    })
+
+                
             }
         },
         props: {

@@ -1,5 +1,8 @@
 <template>
-    <div id="tasksDatatable">        
+    <div id="tasksDatatable">
+        <DeleteConfirmationDialog
+            ref="taskDeleteDialog"/>
+
         <v-card>
             <v-card-title>
                 <h4>{{ this.title }}</h4>
@@ -14,9 +17,10 @@
             </v-card-title>
             
             <v-data-table
-            :headers="this.headers"
-            :items="this.tasks"
-            :search="search">
+                :headers="this.headers"
+                :items="this.tasks"
+                :search="search"
+                no-data-text="No existen tareas. Deberás crear alguna antes para que aparezcan aquí.">
                 <template v-slot:items="props">
                     <td>{{ props.item.customerData.name }} {{ props.item.customerData.surname }}</td>                    
                     <td>{{ props.item.description }}</td>                    
@@ -46,7 +50,7 @@
                             Facturado
                         </v-chip>
                     </td>
-                    <td>{{ props.item.deliveryDate }}</td>
+                    <td>{{ props.item.deliveryDate | formatDate }}</td>
                     <td>
                         <v-btn 
                             flat
@@ -84,12 +88,18 @@
 
 <script>
     import firebase from 'firebase'
+    import moment from 'moment'
+    import DeleteConfirmationDialog from '../dialogs/DeleteConfirmationDialog'
 
     const db = firebase.firestore()
+    let documentsRef = db.collection('billingDocuments')
     let tasksRef = db.collection('tasks')
 
     export default {    
         name: 'TasksDatatable',
+        components: {
+            DeleteConfirmationDialog
+        },
         data() {
             return {
                 tasks: [],
@@ -105,14 +115,35 @@
                 search: ''
             }
         },
+        filters: {
+            formatDate: (date) => {
+                return moment(date).format('DD-MM-YYYY');
+            }
+        },
         methods: {
             deleteTask(task) {
-                tasksRef.doc(task.id).delete()
-                    .then(() => {
-                        let index = this.tasks.map(item => item.id).indexOf(task.id)
+                const title = '¿Estás segur@ de eliminar esta tarea?'
+                const message = 'Este proceso no es reversible. Se va a proceder a eliminar la tarea y no podrás volver ' +
+                                'a recuperarla nunca más.'
 
-                        this.tasks.splice(index, 1)
-                    })                
+                this.$refs.taskDeleteDialog.open(title, message)
+                    .then(() => {
+                        tasksRef.doc(task.id).delete()
+                            .then(() => {
+                                let index = this.tasks.map(item => item.id).indexOf(task.id)
+
+                                this.tasks.splice(index, 1)                                
+                            })
+                            .catch((error) => {
+                                // SEND TO ERROR PAGE TO-DO
+                            })
+                            .finally(() => {
+                                firebase.database().goOffline()
+                            })
+                    })
+                    .catch(() => {
+                        // NOTHING HAPPENS
+                    })
             },
             goToEdit(taskId) {
                 this.$router.push(
@@ -141,11 +172,11 @@
                     })
                 })
                 .catch(error => {
-
+                    // SEND TO ERROR PAGE TO-DO
                 })
                 .finally(() => {
                     firebase.database().goOffline()
-                })
+                })            
         },
         props: {
             title: String

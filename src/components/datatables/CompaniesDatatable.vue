@@ -1,5 +1,8 @@
 <template>
-    <div id="companiesDatatable">        
+    <div id="companiesDatatable">    
+        <DeleteConfirmationDialog
+            ref="companyDeleteDialog"/>
+
         <v-card>
             <v-card-title>
                 <h4>{{ this.title }}</h4>
@@ -14,9 +17,10 @@
             </v-card-title>
             
             <v-data-table
-            :headers="this.headers"
-            :items="this.companies"
-            :search="search">
+                :headers="this.headers"
+                :items="this.companies"
+                :search="search"
+                no-data-text="No existen empresas. Deberás crear alguna antes para que aparezcan aquí.">
                 <template v-slot:items="props">                    
                     <td>{{ props.item.name }}</td>
                     <td>{{ props.item.cif }}</td>
@@ -57,12 +61,16 @@
 
 <script>
     import firebase from 'firebase'
+    import DeleteConfirmationDialog from '../dialogs/DeleteConfirmationDialog'
 
     const db = firebase.firestore()
     let companiesRef = db.collection('customers')
 
     export default {    
         name: 'CompaniesDatatable',
+        components: {
+            DeleteConfirmationDialog
+        },
         data() {
             return {
                 companies: [],
@@ -78,12 +86,28 @@
         },
         methods: {
             deleteCompany(company) {
-                companiesRef.doc(company.id).delete()
-                    .then(() => {
-                        let index = this.companies.map(item => item.id).indexOf(company.id)
+                const title = '¿Estás segur@ de eliminar esta empresa?'
+                const message = 'Este proceso es irreversible y no podrás recuperar los datos borrados. Junto con la empresa se eliminarán ' +
+                                'las tareas, albaranes y facturas de la misma.'
 
-                        this.companies.splice(index, 1)
-                    })                
+                this.$refs.companyDeleteDialog.open(title, message)
+                    .then(() => {
+                        companiesRef.doc(company.id).delete()
+                            .then(() => {
+                                let index = this.companies.map(item => item.id).indexOf(company.id)
+
+                                this.companies.splice(index, 1)
+                            })
+                            .catch((error) => {
+                                // SEND TO ERROR PAGE TO-DO
+                            })
+                            .finally(() => {
+                                firebase.database().goOffline()
+                            })
+                    })
+                    .catch(() => {
+                        // NOTHING HAPPENS
+                    })                                
             },
             goToEdit(customerId) {
                 this.$router.push(

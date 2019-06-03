@@ -1,5 +1,8 @@
 <template>
-    <div id="BillingDocumentsDatatable">        
+    <div id="BillingDocumentsDatatable">
+        <UndoConfirmationDialog
+            ref="undoConfirmationDialog"/>
+
         <v-card>
             <v-card-title>
                 <h4>{{ this.title }}</h4>
@@ -39,13 +42,20 @@
                                     @click="goToView(props.item)">
                                     <v-icon>remove_red_eye</v-icon>
                                 </v-btn>
+                                <v-btn 
+                                    flat
+                                    icon
+                                    color="warning"
+                                    @click="undoDocument(props.item)">
+                                    <v-icon>undo</v-icon>
+                                </v-btn>
                             </td>
                         </tr>
                     </template>
                     <template v-slot:expand="props">
                         <v-card flat>
                             <v-card-text>
-                                <p>Este documento contiene las siguientes tareas:</p>
+                                <p>Este documento contiene la(s) siguiente(s) tarea(s):</p>
                                 <ul v-for="task in props.item.tasksData" v-bind:key="task.id">
                                     <li>{{ task.description }}</li>
                                 </ul>
@@ -65,12 +75,16 @@
 <script>
     import firebase from 'firebase'
     import moment from 'moment'
+    import UndoConfirmationDialog from '../dialogs/UndoConfirmationDialog'
 
     const db = firebase.firestore()
-    let billingDocumentsRef = db.collection('billingDocuments')
+    let documentsRef = db.collection('billingDocuments')
 
     export default {    
         name: 'BillingDocumentsDatatable',
+        components: {
+            UndoConfirmationDialog
+        },
         data() {
             return {
                 expand: false,
@@ -86,7 +100,7 @@
         },
         filters: {
             formatDate: (date) => {
-                return moment(date).format('DD/MM/YYYY HH:mm');
+                return moment(date).format('DD-MM-YYYY HH:mm');
             }
         },
         methods: {
@@ -106,10 +120,35 @@
                             id:  document.id
                         } 
                     })
+            },
+            undoDocument(document) {
+                this.$refs.undoConfirmationDialog.open()
+                    .then(() => {
+                        document.involvedTasks.forEach(task => {
+                        task.update({ state: 'Finalizado' })
+                            .then(res => {
+                                documentsRef.doc(document.id).delete()
+                                    .then(() => {
+                                        let index = this.documents.map(item => item.id).indexOf(document.id)
+
+                                        this.documents.splice(index, 1)
+                                    })                                
+                            })
+                            .catch(error => {
+                                // TO-DO SEND TO ERROR PAGE
+                            })
+                            .finally(() => {
+                                firebase.database().goOffline()
+                            })
+                        })
+                    })
+                    .catch(() => {
+                        // NOTHING HAPPENS
+                    })
             }
         },
         mounted() {
-            billingDocumentsRef.get()
+            documentsRef.get()
                 .then(snapshot => {
                     snapshot.forEach(doc => {
                         let documentData = doc.data()
@@ -130,7 +169,6 @@
                         documentData.involvedTasks.forEach(task => {
                         task.get()
                             .then(res => {
-                                console.log(res.data())
                                 documentData.tasksData.push(res.data())
                             })
                             .catch(error => {

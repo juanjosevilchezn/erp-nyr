@@ -13,8 +13,10 @@
                     </v-btn>
                 </v-flex>
 
-                <v-flex xs12>
-                    <!-- TO-DO ALERT COMPONENT -->
+                <v-flex xs12 mt-2>
+                    <SuccessAlert
+                        ref="successAlert"
+                        message="La tarea ha sido creada con éxito."/>
                 </v-flex>               
 
                 <v-flex xs12 mt-3>
@@ -408,6 +410,7 @@
     import firebase from 'firebase'
     import moment from 'moment'
     import Navigation from '../navigation/Navigation'
+    import SuccessAlert from '../../alerts/SuccessAlert'
 
     const db = firebase.firestore()
     let customersRef = db.collection('customers')
@@ -416,7 +419,8 @@
     export default {    
         name: 'TaskCreate',
         components: {
-            Navigation
+            Navigation,
+            SuccessAlert
         },
         data() {
             return {
@@ -511,8 +515,8 @@
                     this.$refs.formTaskCreate.resetValidation()
                     this.clearForm()
                 }
-            },
-            getFormattedText: item => item.name + ' ' + item.surname + ' (' + item.phone + ')',
+            },   
+            getFormattedText: item => item.type == 'company' ? item.name + ' (' + item.phone + ')' : item.name + ' ' + item.surname + ' (' + item.phone + ')',         
             saveTask() {                
                 let data = {
                     type: this.type,
@@ -530,11 +534,12 @@
                 }
 
                 tasksRef.doc().set(data)
-                    .then(function() {
-                        // active success alert component
+                    .then(() => {
+                        this.$refs.successAlert.isShown = true
                     })
-                    .catch(function() {
+                    .catch(() => {
                         // active error alert component
+                        this.$refs.successAlert.isShown = false
                     })
                     .finally(() => {
                         firebase.database().goOffline()
@@ -550,6 +555,9 @@
                             ...doc.data()
                         })
                     })
+                })
+                .catch(error => {
+                    // SEND TO ERROR PAGE TO-DO
                 })
                 .finally(() => {
                     firebase.database().goOffline()
