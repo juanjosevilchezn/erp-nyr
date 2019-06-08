@@ -487,7 +487,7 @@
             }
         },
         methods: {           
-            allowedDates: (value) => moment(value).format('DD-MM-YYYY') >= moment().format('DD-MM-YYYY'), 
+            allowedDates: (value) => moment(value).isAfter(new Date),
             checkForm() {
                 if (this.$refs.formTaskCreate.validate()) {
                     this.updateTask()

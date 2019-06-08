@@ -28,14 +28,20 @@
           <v-icon>exit_to_app</v-icon>
         </v-btn>
       </v-toolbar>
+      
+      <Footer footer/>
     </div>    
 </template>
 
 <script>
   import firebase from 'firebase'
+  import Footer from '../footer/Footer'
 
   export default {
-    name: 'Navigation',    
+    name: 'Navigation',
+    components: {
+      Footer
+    },
     data() {
       return {
         company_name: 'N&R',
@@ -91,5 +97,12 @@
 <style>
     #navigation {
         height: 100%;
+    }
+
+    #footer {
+      position: fixed;
+      width: 100%;
+      z-index: 4;
+      bottom: 0px;      
     }
 </style>

@@ -3,6 +3,9 @@
         <DeleteConfirmationDialog
             ref="taskDeleteDialog"/>
 
+        <TaskDetailsDialog
+            ref="taskDetailsDialog"/>
+
         <v-card>
             <v-card-title>
                 <h4>{{ this.title }}</h4>
@@ -51,13 +54,14 @@
                         </v-chip>
                     </td>
                     <td>{{ props.item.deliveryDate | formatDate }}</td>
-                    <td>
-                        <v-btn 
+                    <td>          
+                        <v-btn                        
                             flat
                             icon
-                            color="primary">
+                            color="primary"
+                            @click="showTask(props.item)">
                             <v-icon>remove_red_eye</v-icon>
-                        </v-btn>
+                        </v-btn>                        
                         <v-btn 
                             flat
                             icon
@@ -73,7 +77,7 @@
                             @click="deleteTask(props.item)"
                             v-if="props.item.state != 'Entregado' && props.item.state != 'Facturado'">
                             <v-icon>delete</v-icon>
-                        </v-btn>
+                        </v-btn>                        
                     </td>
                 </template>
                 <template v-slot:no-results>
@@ -90,6 +94,7 @@
     import firebase from 'firebase'
     import moment from 'moment'
     import DeleteConfirmationDialog from '../dialogs/DeleteConfirmationDialog'
+    import TaskDetailsDialog from '../dialogs/TaskDetailsDialog'
 
     const db = firebase.firestore()
     let documentsRef = db.collection('billingDocuments')
@@ -98,7 +103,8 @@
     export default {    
         name: 'TasksDatatable',
         components: {
-            DeleteConfirmationDialog
+            DeleteConfirmationDialog,
+            TaskDetailsDialog
         },
         data() {
             return {
@@ -117,7 +123,7 @@
         },
         filters: {
             formatDate: (date) => {
-                return moment(date).format('DD-MM-YYYY');
+                return moment(date.toDate).format('DD-MM-YYYY')
             }
         },
         methods: {
@@ -153,6 +159,10 @@
                             id:  taskId
                         } 
                     })
+            },
+            showTask(task) {
+                this.$refs.taskDetailsDialog.task = task
+                this.$refs.taskDetailsDialog.isShown = true
             }
         },
         mounted() {

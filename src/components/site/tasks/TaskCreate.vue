@@ -472,7 +472,7 @@
             }
         },
         methods: {
-            allowedDates: (value) => moment(value).format('DD-MM-YYYY') >= moment().format('DD-MM-YYYY'),      
+            allowedDates: (value) => moment(value).isAfter(new Date),      
             clearForm() {
                 this.description = ''
                 this.price = 0

@@ -75,7 +75,7 @@
         },
         filters: {
             formatDate: (date) => {
-                return moment(date).format('DD-MM-YYYY HH:mm');
+                return moment(date.toDate).format('DD-MM-YYYY');
             }
         },
         mounted() {

@@ -13,6 +13,12 @@
             ref="invoiceErrorDialogTwo"
             title="Ha ocurrido un error..."/>
 
+        <ErrorDialog
+            message='El cliente no tiene CIF/NIF asociado. Para crear esta factura el cliente debe tener un CIF/NIF 
+                    asociado. Añade este dato en la página "Clientes" y vuelve a intentarlo después.'
+            ref="invoiceErrorDialogThree"
+            title="Ha ocurrido un error..."/>
+
         <v-container fluid>
             <v-layout row fill-width>
                 <v-flex xs2>
@@ -82,6 +88,21 @@
             getCustomerId() {
                 return this.$refs.billableTasksDatatable.selected[0].customer.id
             },
+            hasDocumentation() {
+                let customer = this.$refs.billableTasksDatatable.selected[0].customerData
+                let valid = false
+
+                console.log(customer)
+
+                if (customer.type == 'company') {
+                    valid = customer.cif != '' ? true : false
+                } else if (customer.type == 'person') {
+                    valid = customer.nif != '' ? true : false
+                }
+                console.log(valid)
+
+                return valid
+            },
             involvedTasksDocs() {
                 let docs = []
 
@@ -96,26 +117,30 @@
             saveInvoice() {
                 if (this.$refs.billableTasksDatatable.selected.length) {
                     if (this.areSameCustomersTasksSelected) {
-                        let data = {
-                            customer: db.doc('/customers/' + this.getCustomerId),
-                            involvedTasks: this.involvedTasksDocs,
-                            type: 'invoice',
-                            createdAt: new Date()
-                        }
+                        if (this.hasDocumentation) {
+                            let data = {
+                                customer: db.doc('/customers/' + this.getCustomerId),
+                                involvedTasks: this.involvedTasksDocs,
+                                type: 'invoice',
+                                createdAt: new Date()
+                            }
 
-                        billingDocumentsRef.set(data)
-                            .then(() => {
-                                // active success alert component TO-DO
-                            })
-                            .catch(error => {
-                                // active error alert component TO-DO
-                            })
-                            .finally(() => {
-                                firebase.database().goOffline()
-                            })
+                            billingDocumentsRef.set(data)
+                                .then(() => {
+                                    // active success alert component TO-DO
+                                })
+                                .catch(error => {
+                                    // active error alert component TO-DO
+                                })
+                                .finally(() => {
+                                    firebase.database().goOffline()
+                                })
 
-                        this.setBilledState()
-                        this.$refs.billableTasksDatatable.selected = []
+                            this.setBilledState()
+                            this.$refs.billableTasksDatatable.selected = []
+                        } else {
+                            this.$refs.invoiceErrorDialogThree.isShown = true
+                        }                        
                     } else {
                         this.$refs.invoiceErrorDialogTwo.isShown = true
                     }                    

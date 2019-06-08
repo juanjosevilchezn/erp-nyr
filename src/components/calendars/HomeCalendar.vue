@@ -6,7 +6,29 @@
                 flat 
                 width="100%">
                 <v-card-text>
-                    <h2 style="color: white;">{{ getActualMonthString }}</h2>
+                    <v-layout ro align-center> 
+                        <v-flex xs2>
+                            <v-btn
+                                fab
+                                color="white"
+                                small
+                                @click="$refs.calendar.prev()">
+                                <v-icon>keyboard_arrow_left</v-icon>
+                            </v-btn>
+                        </v-flex>
+                        <v-flex xs8 text-xs-center>
+                            <h2 style="color: white;">{{ getActualMonthYearString }}</h2>
+                        </v-flex>
+                        <v-flex xs2 text-sm-right>
+                            <v-btn
+                                fab
+                                color="white"
+                                small
+                                @click="$refs.calendar.next()">
+                                <v-icon>keyboard_arrow_right</v-icon>
+                            </v-btn>
+                        </v-flex>
+                    </v-layout>                    
                 </v-card-text>
             </v-card>
         </v-layout>
@@ -14,8 +36,10 @@
             <v-flex>
                 <v-sheet height="600">
                     <v-calendar
-                        :now="today"
-                        :value="today"
+                        ref="calendar"
+                        v-model="start"
+                        :today="today"
+                        type="month"
                         locale="es"
                         color="primary"
                         :weekdays="[1, 2, 3, 4, 5]">
@@ -33,7 +57,7 @@
                                             class="my-event"
                                             v-on="on"
                                             v-html="event.title"
-                                            :style="event.type == 'arrangement' ? 'background-color: orange; border-color: orange;' : 'background-color: #3f51b5; border-color: #3f51b5;'"/>
+                                            :style="'background-color: ' + getTaskColor(event) + ';'"/>
                                     </template>
 
                                     <v-card
@@ -42,7 +66,7 @@
                                         max-width="350px"
                                         flat>
                                     <v-toolbar
-                                        :color="event.type == 'arrangement' ? 'orange' : 'indigo'"
+                                        :color="getTaskColor(event)"
                                         dark>
                                         <v-toolbar-title v-html="event.title"/>
                                         <v-spacer></v-spacer>
@@ -52,7 +76,7 @@
                                     </v-toolbar>
                                     <v-card-title primary-title>
                                         <p><span v-if="event.type == 'arrangement'">Este arreglo</span><span v-else-if="event.type == 'manufacture'">Esta confección</span> pertenece a <span v-if="event.details.type == 'company'"><b>{{ event.details.name }}</b></span>
-                                        <v-span v-else-if="event.details.type == 'person'"><b>{{ event.details.name }} {{ event.details.surname }}</b></v-span>,
+                                        <span v-else-if="event.details.type == 'person'"><b>{{ event.details.name }} {{ event.details.surname }}</b></span>,
                                         puedes contactar con el cliente a través de su número: <b>{{ event.details.phone}}</b>.</p>
                                     </v-card-title>
                                     <v-card-actions>
@@ -70,7 +94,7 @@
                                             outline
                                             color="green"
                                             style="width: 45%;"
-                                            @click.prevent="confirmTask(event.id)">                                        
+                                            @click.prevent="finishTask(event.id)">                                        
                                             Finalizar tarea                                      
                                         </v-btn>
                                         </v-layout>
@@ -96,8 +120,9 @@
 
     export default {
         data: () => ({
-            today: new Date(),
-            events: []
+            events: [],
+            start: moment(new Date()).format('YYYY-MM-DD'),
+            today: moment(new Date()).format('YYYY-MM-DD')      
         }),
         computed: {
             // convert the list of events into a map of lists keyed by date
@@ -106,15 +131,17 @@
                 this.events.forEach(e => (map[e.date] = map[e.date] || []).push(e))
                 return map
             },
-            getActualMonthString() {
-                return moment().format('MMMM');
+            getActualMonthYearString() {
+                return moment(this.start).format('MMMM YYYY');
             }
         },
         methods: {
-            confirmTask(taskId) {
+            finishTask(taskId) {
                 tasksRef.doc(taskId).update({ state: 'Finalizado' })
                     .then(() => {
-                        alert('perfecto')
+                        let index = this.events.map(item => item.id).indexOf(taskId)
+
+                        this.events.splice(index, 1)
                     })
                     .catch(error => {
                         // SEND TO ERROR PAGE TO-DO
@@ -122,6 +149,21 @@
                     .finally(() => {
                         firebase.database().goOffline()
                     })
+            },            
+            getTaskColor(task) {
+                let color = ''
+
+                if (new Date(task.date) < new Date()) {
+                    color = 'gray'
+                } else {
+                    if (task.details.type == 'arrangement') {
+                        color = 'orange'
+                    } else {
+                        color = '#3f51b5'
+                    }
+                }
+
+                return color
             },
             goToEdit(taskId) {
                 this.$router.push(

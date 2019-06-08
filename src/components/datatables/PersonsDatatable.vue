@@ -3,6 +3,9 @@
         <DeleteConfirmationDialog
             ref="personDeleteDialog"/>
 
+        <CustomerDetailsDialog
+            ref="customerDetailsDialog"/>
+
         <v-card>
             <v-card-title>
                 <h4>{{ this.title }}</h4>
@@ -31,7 +34,8 @@
                         <v-btn 
                             flat
                             icon
-                            color="primary">
+                            color="primary"
+                            @click="showPerson(props.item)">
                             <v-icon>remove_red_eye</v-icon>
                         </v-btn>
                         <v-btn 
@@ -63,6 +67,7 @@
 <script>
     import firebase from 'firebase'
     import DeleteConfirmationDialog from '../dialogs/DeleteConfirmationDialog'
+    import CustomerDetailsDialog from '../dialogs/CustomerDetailsDialog'
 
     const db = firebase.firestore()
     let personsRef = db.collection('customers')
@@ -70,6 +75,7 @@
     export default {    
         name: 'PersonsDatatable',
         components: {
+            CustomerDetailsDialog,
             DeleteConfirmationDialog
         },
         data() {
@@ -119,6 +125,10 @@
                             id:  customerId
                         } 
                     })
+            },
+            showPerson(person) {
+                this.$refs.customerDetailsDialog.customer = person
+                this.$refs.customerDetailsDialog.isShown = true
             }
         },
         mounted() {
