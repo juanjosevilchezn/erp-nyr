@@ -14,6 +14,7 @@ import DeliveryNotePreview from '../components/site/billing/deliveryNotes/Delive
 import InvoicePreview from '../components/site/billing/invoices/InvoicePreview'
 import DeliveryNoteCreate from '../components/site/billing/deliveryNotes/DeliveryNoteCreate'
 import InvoiceCreate from '../components/site/billing/invoices/InvoiceCreate'
+import Notifications from '../components/site/notifications/Notifications'
 
 Vue.use(Router)
 
@@ -153,6 +154,17 @@ let router = new Router({
       },
       props: {
         title: 'Facturar tareas'
+      }
+    },
+    {
+      path: '/notifications',
+      name: 'Notifications',
+      component: Notifications,
+      meta: {
+        requiresAuth: true
+      },
+      props: {
+        title: 'Notificaciones'
       }
     }
   ]
