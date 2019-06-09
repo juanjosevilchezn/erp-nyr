@@ -9,7 +9,7 @@
                   encuentren en estado "Confirmado".'/>
       </v-layout>
       <v-layout row fill-width>
-        <HomeCalendar/>
+        <HomeCalendar style="margin-top: 15px;"/>
       </v-layout>
     </v-container>
   </div>

@@ -1,9 +1,12 @@
 <template>
-    <v-alert style="width: 100%"
-        value="true"
-        type="info">
-        {{ message }}
-    </v-alert>
+    <div id="info-alert" style="width: 100%">
+        <v-alert 
+            class="elevation-6"
+            value="true"
+            type="info">
+            {{ message }}
+        </v-alert>
+    </div>
 </template>
 
 <script>

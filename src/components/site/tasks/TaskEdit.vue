@@ -8,7 +8,8 @@
                     <v-btn
                         block
                         color="primary"
-                        href="/tasks">
+                        href="/tasks"
+                        class="elevation-6">
                         <v-icon>arrow_back</v-icon><span>&nbsp; Atrás</span>
                     </v-btn>
                 </v-flex>
@@ -20,14 +21,15 @@
                 </v-flex>               
 
                 <v-flex xs12 mt-3>
-                    <v-card color="grey lighten-4">
+                    <v-card color="grey lighten-4" class="elevation-6">
                         <v-card-text>
                             <h2 style="color: grey;">Datos de la tarea</h2>
                             
                             <v-form
                                 ref="formTaskCreate"
                                 v-model="valid"
-                                lazy-validation>
+                                lazy-validation
+                                @submit.prevent="checkForm">
                                 <v-layout row>
                                     <v-flex xs12>
                                         <v-radio-group v-model="type" row>
@@ -41,7 +43,7 @@
                                         <v-text-field
                                             v-model="description"
                                             label="Descripción de la tarea"
-                                            :rules="requiredStringRule"
+                                            :rules="required"
                                             outline
                                             required>
                                         </v-text-field>
@@ -51,7 +53,7 @@
                                             :items="states"
                                             v-model="state"
                                             label="Estado"
-                                            :rules="requiredStringRule"
+                                            :rules="required"
                                             item-value="name"
                                             item-text="name"
                                             editable
@@ -65,7 +67,7 @@
                                             :items="customers"
                                             v-model="customerData.id"
                                             label="Cliente"
-                                            :rules="requiredStringRule"
+                                            :rules="required"
                                             item-value="id"
                                             :item-text="getFormattedText"
                                             editable
@@ -76,7 +78,7 @@
                                         <v-text-field
                                             v-model="quantity"
                                             label="Cantidad"
-                                            :rules="requiredNumberRule"
+                                            :rules="required_number"
                                             type="number"
                                             min="1"
                                             outline
@@ -101,7 +103,8 @@
                                                     label="Fecha máxima de entrega"
                                                     readonly
                                                     outline                                                    
-                                                    v-on="on">
+                                                    v-on="on"
+                                                    :rules="required">
                                                 </v-text-field>
                                             </template>
                                             <v-date-picker
@@ -115,7 +118,7 @@
                                         <v-text-field
                                             v-model="price"                                            
                                             label="Precio"
-                                            :rules="requiredNumberRule"
+                                            :rules="required_number"
                                             type="number"
                                             min="0"
                                             outline
@@ -403,8 +406,8 @@
                                         <v-btn
                                             block
                                             color="success"
-                                            @click="checkForm">
-                                            <v-icon>done</v-icon><span>&nbsp; Guardar datos</span>
+                                            type="submit">
+                                            <v-icon>save</v-icon><span>&nbsp; Guardar datos</span>
                                         </v-btn>
                                     </v-flex>
                                 </v-layout>
@@ -418,7 +421,6 @@
 </template>
 
 <script>
-    /* eslint-disable */
     import firebase from 'firebase'
     import moment from 'moment'
     import Navigation from '../navigation/Navigation'
@@ -475,10 +477,10 @@
                 state: '',             
                 customers: [],
                 states: ['Presupuestado', 'Confirmado', 'Finalizado'],
-                requiredStringRule: [
+                required: [
                     v => !!v || 'Este campo es requerido'
                 ],
-                requiredNumberRule: [
+                required_number: [
                     v => (v != '' || v.toString() == '0') || 'Este campo es requerido',
                     v => v >= 0 || 'Debes introducir un número positivo'
                 ],
@@ -526,9 +528,9 @@
                     .then(() => {
                         this.$refs.successAlert.isShown = true
                     })
-                    .catch(error => {
-                        // active error alert component
+                    .catch(error => {                        
                         this.$refs.successAlert.isShown = false
+                        this.$rollbar.warning('Aviso. No se ha podido actualizar la tarea en el método updateTask() del componente TaskEdit. ' + error)
                     })
                     .finally(() => {
                         firebase.database().goOffline()
@@ -545,8 +547,8 @@
                         })
                     })
                 })
-                .catch(() => {
-                    // send to error page TO-DO
+                .catch(error => {
+                    this.$rollbar.critical('Crítico. No se ha podido recuperar los clientes en el método mounted() del componente TaskEdit. ' + error)
                 })
                 .finally(() => {
                     firebase.database().goOffline()
@@ -566,7 +568,7 @@
                         })
                 })
                 .catch(error => {
-                    // send to error page TO-DO
+                    this.$rollbar.critical('Crítico. No se ha podido recuperar los datos de la tarea ' + this.$route.params.id + ' en el método mounted() del componente TaskEdit. ' + error)
                 })
                 .finally(() => {
                     firebase.database().goOffline()

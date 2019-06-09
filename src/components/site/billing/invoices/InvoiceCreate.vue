@@ -25,7 +25,8 @@
                     <v-btn
                         block
                         color="primary"
-                        href="/billing">
+                        href="/billing"
+                        class="elevation-6">
                         <v-icon>arrow_back</v-icon><span>&nbsp; Atrás</span>
                     </v-btn>
                 </v-flex>
@@ -34,6 +35,12 @@
             <v-layout row fill-width mt-3>
                 <InfoAlert
                     message="En este listado solo aparecerán aquellas tareas que se encuentren entregadas o finalizadas."/>
+            </v-layout>
+
+            <v-layout row fill-width mt-3>
+                <SuccessAlert
+                    ref="successAlert"
+                    message="La factura ha sido generada con éxito."/>
             </v-layout>
 
             <v-layout row wrap mt-3 fill-width>
@@ -47,8 +54,10 @@
                     <v-btn
                         block
                         color="success"
-                        @click="this.saveInvoice">
-                        <v-icon>done</v-icon><span>&nbsp; Crear factura</span>
+                        @click="this.saveInvoice"
+                        class="elevation-6"
+                        style="margin-top: 10px;">
+                        <v-icon>create</v-icon><span>&nbsp; Crear factura</span>
                     </v-btn>
                 </v-flex>
             </v-layout>                  
@@ -60,6 +69,7 @@
     import firebase from 'firebase'
     import ErrorDialog from '../../../dialogs/ErrorDialog'
     import InfoAlert from '../../../alerts/InfoAlert'
+    import SuccessAlert from '../../../alerts/SuccessAlert'
     import Navigation from '../../navigation/Navigation'
     import BillableTasksDatatable from '../../../datatables/BillableTasksDatatable'
 
@@ -72,6 +82,7 @@
         components: {
             BillableTasksDatatable,
             ErrorDialog,
+            SuccessAlert,
             InfoAlert,
             Navigation
         },
@@ -92,14 +103,11 @@
                 let customer = this.$refs.billableTasksDatatable.selected[0].customerData
                 let valid = false
 
-                console.log(customer)
-
                 if (customer.type == 'company') {
                     valid = customer.cif != '' ? true : false
                 } else if (customer.type == 'person') {
                     valid = customer.nif != '' ? true : false
                 }
-                console.log(valid)
 
                 return valid
             },
@@ -127,10 +135,11 @@
 
                             billingDocumentsRef.set(data)
                                 .then(() => {
-                                    // active success alert component TO-DO
+                                    this.$refs.successAlert.isShown = true
                                 })
                                 .catch(error => {
-                                    // active error alert component TO-DO
+                                    this.$refs.successAlert.isShown = false
+                                    this.$rollbar.warning('Aviso. No ha sido posible guardar la factura en el método saveInvoice() del componente InvoiceCreate. ' + error)
                                 })
                                 .finally(() => {
                                     firebase.database().goOffline()

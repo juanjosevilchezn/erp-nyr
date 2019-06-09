@@ -1,6 +1,6 @@
 <template>
     <div id="finishedTasksDatatable">        
-        <v-card>
+        <v-card class="elevation-6">
             <v-card-title>
                 <h4>{{ this.title }}</h4>
                 <v-spacer></v-spacer>
@@ -97,7 +97,7 @@
                     })
                 })
                 .catch(error => {
-
+                    this.$rollbar.critical('Crítico. No se han podido recuperar las tareas en el método mounted() del componente FinishedTasksDatatable. ' + error)
                 })
                 .finally(() => {
                     firebase.database().goOffline()

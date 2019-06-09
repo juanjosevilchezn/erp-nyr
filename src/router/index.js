@@ -15,6 +15,7 @@ import InvoicePreview from '../components/site/billing/invoices/InvoicePreview'
 import DeliveryNoteCreate from '../components/site/billing/deliveryNotes/DeliveryNoteCreate'
 import InvoiceCreate from '../components/site/billing/invoices/InvoiceCreate'
 import Notifications from '../components/site/notifications/Notifications'
+import Settings from '../components/site/settings/Settings'
 
 Vue.use(Router)
 
@@ -28,7 +29,10 @@ let router = new Router({
     {
       path: '/login',
       name: 'Login',
-      component: Login
+      component: Login,
+      meta: {
+        requiresGuest: true
+      }
     },
     {
       path: '/home',
@@ -165,6 +169,17 @@ let router = new Router({
       },
       props: {
         title: 'Notificaciones'
+      }
+    },
+    {
+      path: '/settings',
+      name: 'Settings',
+      component: Settings,
+      meta: {
+        requiresAuth: true
+      },
+      props: {
+        title: 'Ajustes'
       }
     }
   ]

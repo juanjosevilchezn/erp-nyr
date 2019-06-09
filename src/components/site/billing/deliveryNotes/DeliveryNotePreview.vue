@@ -27,11 +27,11 @@
                 </v-flex>
                 <v-flex xs5 billing-details>
                     <b>Albarán por:</b><br/><br/>
-                    N&amp;R arreglos y confección<br/>
-                    45789789D<br/>
-                    Calle Muñoz Seca, 24 (local)<br/>
-                    Los Palacios y Villafranca<br/>
-                    Sevilla, 41720
+                    {{ settings.comercial_name }}<br/>
+                    {{ settings.cif }}<br/>
+                    {{ settings.address.home_address }}<br/>
+                    {{ settings.address.locality }}, {{ settings.address.province }}<br/>
+                    {{ settings.address.zip }}
                 </v-flex>
                 <v-flex xs12 mb-4 mt-4>
                     <hr/>
@@ -102,7 +102,8 @@
     import firebase from 'firebase'
 
     const db = firebase.firestore()
-    let documentsRef = db.collection('billingDocuments')
+    const documentsRef = db.collection('billingDocuments')
+    const settingsRef = db.collection('settings').doc('RszgIiX4x0cpCiRTsU')
 
     export default {
         name: 'InvoicePreview',
@@ -172,6 +173,21 @@
                         country: '',
                     }
                 },
+                settings: {
+                    cif: '',                    
+                    comercial_name: '',
+                    brand: '',
+                    address: {
+                        home_address: '',
+                        locality: '',
+                        province: '',
+                        zip: ''
+                    },
+                    email: '',
+                    tlf_fijo: '',
+                    phone: '',
+                    url_photo: ''
+                },
                 deliveryNote: {},
                 tasks: []
             }
@@ -187,6 +203,17 @@
             }
         },
         mounted() {
+            settingsRef.get()
+                .then((doc) => {
+                    this.settings = doc.data()
+                })
+                .catch((error) => {
+                    this.$rollbar.critical('Crítico. No se han podido recuperar los datos de la empresa en el método mounted() del componente DeliveryNotePreview. ' + error)
+                })
+                .finally(() => {
+                    firebase.database().goOffline()
+                })
+
             documentsRef.doc(this.$route.params.id).get()
                 .then(doc => {
                     this.deliveryNote = {
@@ -203,7 +230,7 @@
                             }
                         })
                         .catch(error => {
-                            // TO-DO SEND TO ERROR PAGE
+                            this.$rollbar.critical('Crítico. No se ha podido recuperar el cliente en el método mounted() del componente DeliveryNotePreview. ' + error)
                         })
 
                     doc.data().involvedTasks.forEach(task => {
@@ -215,12 +242,12 @@
                                 })
                             })
                             .catch(error => {
-                                // TO-DO SEND TO ERROR PAGE
+                                this.$rollbar.critical('Crítico. No se han podido recuperar las tareas involucradas en el método mounted() del componente DeliveryNotePreview. ' + error)
                             })
                     })
                 })
                 .catch(error => {
-                    // TO-DO SEND TO ERROR PAGE
+                    this.$rollbar.critical('Crítico. No se han podido recuperar los documentos en el método mounted() del componente DeliveryNotePreview. ' + error)
                 })
                 .finally(() => {
                     firebase.database().goOffline()

@@ -4,19 +4,21 @@
 
         <v-container fluid>
             <v-layout row fill-width>
-                <v-flex xs4 pr-2>
+                <v-flex xs6 pr-2>
                     <v-btn
                         block
                         color="success"
-                        href="/billing/createDeliveryNote">
+                        href="/billing/createDeliveryNote"
+                        class="elevation-6">
                         <v-icon>add_circle_outline</v-icon><span>&nbsp; Crear albarán de entrega</span>
                     </v-btn>
                 </v-flex>
-                <v-flex xs3 pl-2>
+                <v-flex xs6 pl-2>
                     <v-btn
                         block
                         color="warning"
-                        href="/billing/createInvoice">
+                        href="/billing/createInvoice"
+                        class="elevation-6">
                         <v-icon>add_circle_outline</v-icon><span>&nbsp; Crear factura</span>
                     </v-btn>
                 </v-flex>

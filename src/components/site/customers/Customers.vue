@@ -4,11 +4,12 @@
 
         <v-container fluid>
             <v-layout row wrap fill-width>
-                <v-flex xs2>
+                <v-flex xs3>
                     <v-btn
                         block
                         color="success"
-                        href="/customers/create">
+                        href="/customers/create"
+                        class="elevation-6">
                         <v-icon>add_circle_outline</v-icon><span>&nbsp; Nuevo cliente</span>
                     </v-btn>
                 </v-flex>
@@ -18,7 +19,7 @@
                         title="Listado de empresas"/>
                 </v-flex>
 
-                <v-flex xs12 mt-3>
+                <v-flex xs12 mt-4>
                     <PersonsDatatable
                         title="Listado de personas"/>
                 </v-flex>
@@ -28,20 +29,19 @@
 </template>
 
 <script>
-/* eslint-disable */
-import CompaniesDatatable from '../../datatables/CompaniesDatatable'
-import PersonsDatatable from '../../datatables/PersonsDatatable'
-import Navigation from '../navigation/Navigation'
+    import CompaniesDatatable from '../../datatables/CompaniesDatatable'
+    import PersonsDatatable from '../../datatables/PersonsDatatable'
+    import Navigation from '../navigation/Navigation'
 
-export default {    
-    name: 'Customers',
-    components: {
-        CompaniesDatatable,
-        PersonsDatatable,
-        Navigation
-    },
-    props: {
-        title: String
+    export default {    
+        name: 'Customers',
+        components: {
+            CompaniesDatatable,
+            PersonsDatatable,
+            Navigation
+        },
+        props: {
+            title: String
+        }
     }
-}
 </script>

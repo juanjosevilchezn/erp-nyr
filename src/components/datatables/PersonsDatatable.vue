@@ -6,7 +6,7 @@
         <CustomerDetailsDialog
             ref="customerDetailsDialog"/>
 
-        <v-card>
+        <v-card class="elevation-6">
             <v-card-title>
                 <h4>{{ this.title }}</h4>
                 <v-spacer></v-spacer>
@@ -70,7 +70,9 @@
     import CustomerDetailsDialog from '../dialogs/CustomerDetailsDialog'
 
     const db = firebase.firestore()
-    let personsRef = db.collection('customers')
+    const documentsRef = db.collection('billingDocuments')
+    const personsRef = db.collection('customers')
+    const tasksRef = db.collection('tasks')
 
     export default {    
         name: 'PersonsDatatable',
@@ -99,19 +101,48 @@
                                 'las tareas, albaranes y facturas del mismo.'
 
                 this.$refs.personDeleteDialog.open(title, message)
-                    .then(() => {
-                        personsRef.doc(person.id).delete()
+                    .then(async () => {
+                        const personRef = personsRef.doc(person.id)
+
+                        await documentsRef.where('customer', '==', personRef).get()
+                            .then(docs => {
+                                docs.forEach(doc => {
+                                    doc.ref.delete()
+                                })
+                            })
+                            .catch(error => {
+                                this.$rollbar.warning('Aviso. No ha sido posible eliminar los documentos del cliente ' + person.id + ' en el método deletePerson() del componente PersonsDatatable. ' + error)
+                            })
+                            .finally(() => {
+                                firebase.database().goOffline()
+                            })
+
+                        await tasksRef.where('customer', '==', personRef).get()
+                            .then(docs => {
+                                docs.forEach(doc => {
+                                    doc.ref.delete()
+                                })
+                            })
+                            .catch(error => {
+                                this.$rollbar.warning('Aviso. No ha sido posible eliminar las tareas del cliente ' + person.id + ' en el método deletePerson() del componente PersonsDatatable. ' + error)
+                            })
+                            .finally(() => {
+                                firebase.database().goOffline()
+                            })
+
+                        await personRef.delete()
                             .then(() => {
                                 let index = this.persons.map(item => item.id).indexOf(person.id)
 
                                 this.persons.splice(index, 1)
                             }) 
-                            .catch((error) => {
-                                // SEND TO ERROR PAGE TO-DO
+                            .catch(error => {
+                                this.$rollbar.warning('Aviso. No ha sido posible eliminar el cliente ' + person.id + ' en el método deletePerson() del componente PersonsDatatable. ' + error)
                             })
                             .finally(() => {
                                 firebase.database().goOffline()
                             })
+                            
                     })
                     .catch(() => {
                         // NOTHING HAPPENS
@@ -142,6 +173,12 @@
                             })
                         }
                     })
+                })
+                .catch(error => {
+                    this.$rollbar.critical('Crítico. No ha sido posible recuperar los clientes en el método mounted() del componente PersonsDatatable. ' + error)
+                })
+                .finally(() => {
+                    firebase.database().goOffline()
                 })
         },
         props: {

@@ -6,7 +6,7 @@
         <TaskDetailsDialog
             ref="taskDetailsDialog"/>
 
-        <v-card>
+        <v-card class="elevation-6">
             <v-card-title>
                 <h4>{{ this.title }}</h4>
                 <v-spacer></v-spacer>
@@ -97,7 +97,6 @@
     import TaskDetailsDialog from '../dialogs/TaskDetailsDialog'
 
     const db = firebase.firestore()
-    let documentsRef = db.collection('billingDocuments')
     let tasksRef = db.collection('tasks')
 
     export default {    
@@ -141,7 +140,7 @@
                                 this.tasks.splice(index, 1)                                
                             })
                             .catch((error) => {
-                                // SEND TO ERROR PAGE TO-DO
+                                this.$rollbar.warning('Aviso. No ha sido posible eliminar la tarea ' + task.id + ' en el método deleteTask() del componente TasksDatatable. ' + error)
                             })
                             .finally(() => {
                                 firebase.database().goOffline()
@@ -182,7 +181,7 @@
                     })
                 })
                 .catch(error => {
-                    // SEND TO ERROR PAGE TO-DO
+                    this.$rollbar.critical('Crítico. No ha sido posible recuperar las tareas en el método mounted() del componente TasksDatatable. ' + error)
                 })
                 .finally(() => {
                     firebase.database().goOffline()

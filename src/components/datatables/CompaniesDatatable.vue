@@ -6,7 +6,7 @@
         <CustomerDetailsDialog
             ref="customerDetailsDialog"/>
 
-        <v-card>
+        <v-card class="elevation-6">
             <v-card-title>
                 <h4>{{ this.title }}</h4>
                 <v-spacer></v-spacer>
@@ -70,6 +70,8 @@
 
     const db = firebase.firestore()
     let companiesRef = db.collection('customers')
+    const documentsRef = db.collection('billingDocuments')
+    const tasksRef = db.collection('tasks')
 
     export default {    
         name: 'CompaniesDatatable',
@@ -97,23 +99,52 @@
                                 'las tareas, albaranes y facturas de la misma.'
 
                 this.$refs.companyDeleteDialog.open(title, message)
-                    .then(() => {
-                        companiesRef.doc(company.id).delete()
-                            .then(() => {
-                                let index = this.companies.map(item => item.id).indexOf(company.id)
+                    .then(async () => {
+                        const companyRef = companiesRef.doc(company.id)
 
-                                this.companies.splice(index, 1)
+                        await documentsRef.where('customer', '==', companyRef).get()
+                            .then(docs => {
+                                docs.forEach(doc => {
+                                    doc.ref.delete()
+                                })
                             })
                             .catch((error) => {
-                                // SEND TO ERROR PAGE TO-DO
+                                this.$rollbar.warning('Aviso. No ha sido posible eliminar los documentos del cliente ' + company.id + ' en el método deleteCompany() del componente CompaniesDatatable. ' + error)
                             })
                             .finally(() => {
                                 firebase.database().goOffline()
                             })
+
+                        await tasksRef.where('customer', '==', companyRef).get()
+                            .then(docs => {
+                                docs.forEach(doc => {
+                                    doc.ref.delete()
+                                })
+                            })
+                            .catch((error) => {
+                                this.$rollbar.warning('Aviso. No ha sido posible eliminar las tareas del cliente ' + company.id + ' en el método deleteCompany() del componente CompaniesDatatable. ' + error)
+                            })
+                            .finally(() => {
+                                firebase.database().goOffline()
+                            })
+
+                        await companyRef.delete()
+                            .then(() => {
+                                let index = this.companies.map(item => item.id).indexOf(company.id)
+
+                                this.companies.splice(index, 1)
+                            }) 
+                            .catch((error) => {
+                                this.$rollbar.warning('Aviso. No ha sido posible eliminar el cliente ' + company.id + ' en el método deleteCompany() del componente CompaniesDatatable. ' + error)
+                            })
+                            .finally(() => {
+                                firebase.database().goOffline()
+                            })
+                            
                     })
                     .catch(() => {
                         // NOTHING HAPPENS
-                    })                                
+                    })
             },
             goToEdit(customerId) {
                 this.$router.push(
@@ -140,6 +171,12 @@
                             })
                         }
                     })
+                })
+                .catch(error => {
+                    this.$rollbar.critical('Crítico. No ha sido posible recuperar los clientes en el método mounted() del componente CompaniesDatatable. ' + error)
+                })
+                .finally(() => {
+                    firebase.database().goOffline()
                 })
         },
         props: {

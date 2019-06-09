@@ -3,12 +3,13 @@
         <Navigation :app_part="title"/>
 
         <v-container fluid>
-            <v-card style="width: 100%;">
+            <v-card style="width: 100%;" class="elevation-6">
                 <v-card-text>
                     <v-form
                         ref="messageForm"
                         v-model="valid"
-                        lazy-validation>
+                        lazy-validation
+                        @submit.prevent="sendMessage">
                         <v-layout row>
                             <v-combobox
                                 v-model="selected"
@@ -34,7 +35,7 @@
                                 block
                                 bold
                                 color="success"
-                                @click.prevent="sendMessage">
+                                type="submit">
                                 Enviar mensaje &nbsp;&nbsp;<v-icon>send</v-icon>
                             </v-btn>
                         </v-layout>
@@ -98,8 +99,8 @@
                         })
                     })
                 })
-                .catch((error) => {
-                    // TO-DO SEND TO ERROR PAGE
+                .catch(error => {
+                    this.$rollbar.critical('Crítico. No se han podido los clientes en el método mounted() del componente Notifications. ' + error)
                 })
                 .finally(() => {
                     firebase.database().goOffline()

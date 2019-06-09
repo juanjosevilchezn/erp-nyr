@@ -1,12 +1,12 @@
 <template>
-    <div style="width: 100%;">
-        <v-layout mt-3 row style="width: 100%;">
+    <div style="width: 100%;" class="elevation-6">
+        <v-layout row style="width: 100%;">
             <v-card
                 color="primary"
                 flat 
                 width="100%">
                 <v-card-text>
-                    <v-layout ro align-center> 
+                    <v-layout row align-center> 
                         <v-flex xs2>
                             <v-btn
                                 fab
@@ -42,7 +42,7 @@
                         type="month"
                         locale="es"
                         color="primary"
-                        :weekdays="[1, 2, 3, 4, 5]">
+                        :weekdays="[1, 2, 3, 4, 5, 6, 0]">
                         <template v-slot:day="{ date }">
                             <template v-for="event in eventsMap[date]">
                                 <v-menu
@@ -144,7 +144,7 @@
                         this.events.splice(index, 1)
                     })
                     .catch(error => {
-                        // SEND TO ERROR PAGE TO-DO
+                        this.$rollbar.warning('Aviso. No ha sido posible finalizar la tarea ' + taskId + ' en el método finishTask() del componente HomeCalendar. ' + error)
                     })
                     .finally(() => {
                         firebase.database().goOffline()
@@ -205,7 +205,7 @@
                     })
                 })
                 .catch(error => {
-                    // SEND TO ERROR PAGE TO-DO
+                     this.$rollbar.critical('Crítico. No se han podido recuperar las tareas para rellenar el calendario en el método mounted() del componente HomeCalendar. ' + error)
                 })
                 .finally(() => {
                     firebase.database().goOffline()

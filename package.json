@@ -1,6 +1,6 @@
 {
   "name": "erp-nyr",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -13,6 +13,7 @@
     "material-design-icons-iconfont": "^5.0.1",
     "moment": "^2.24.0",
     "vue": "^2.6.10",
+    "vue-rollbar": "^1.0.0",
     "vue-router": "^3.0.6",
     "vuefire": "^1.4.5",
     "vuetify": "^1.5.5"

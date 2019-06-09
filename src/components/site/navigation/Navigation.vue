@@ -37,6 +37,9 @@
   import firebase from 'firebase'
   import Footer from '../footer/Footer'
 
+  const db = firebase.firestore()
+  const settingsRef = db.collection('settings').doc('RszgIiX4x0cpCiRTsU')
+
   export default {
     name: 'Navigation',
     components: {
@@ -44,7 +47,7 @@
     },
     data() {
       return {
-        company_name: 'N&R',
+        company_name: '',
         drawer: false,
         options: [
           {
@@ -87,6 +90,18 @@
           .signOut()
           .then(() => this.$router.replace('login'))
       }
+    },
+    beforeCreate() {
+      settingsRef.get()
+        .then((doc) => {
+            this.company_name = doc.data().brand
+        })
+        .catch(error => {
+            this.$rollbar.critical('Crítico. No se ha podido recuperar la marca de la empresa ' + this.$route.params.id + ' en el método beforeCreate() del componente Navigation. ' + error)
+        })
+        .finally(() => {
+            firebase.database().goOffline()
+        })
     },
     props: {
       app_part: String

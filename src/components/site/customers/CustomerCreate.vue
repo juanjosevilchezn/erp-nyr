@@ -8,7 +8,8 @@
                     <v-btn
                         block
                         color="primary"
-                        href="/customers">
+                        href="/customers"
+                        class="elevation-6">
                         <v-icon>arrow_back</v-icon><span>&nbsp; Atrás</span>
                     </v-btn>
                 </v-flex>
@@ -20,14 +21,15 @@
                 </v-flex>               
 
                 <v-flex xs12 mt-3>
-                    <v-card color="grey lighten-4">
+                    <v-card color="grey lighten-4" class="elevation-6">
                         <v-card-text>
                             <h2 style="color: grey;">Datos del cliente</h2>
                             
                             <v-form
                                 ref="formCustomerCreate"
                                 v-model="valid"
-                                lazy-validation>
+                                lazy-validation
+                                @submit.prevent="checkForm">
                                 <v-layout row>
                                     <v-flex xs12>
                                         <v-radio-group v-model="customerType" row>
@@ -72,6 +74,7 @@
                                         <v-text-field
                                             v-model="nif"
                                             label="NIF"
+                                            mask="########-A"
                                             outline>
                                         </v-text-field>
                                     </v-flex>
@@ -85,9 +88,9 @@
                                     <v-flex xs6 pl-2>
                                         <v-text-field
                                             v-model="phone"
-                                            type="number"
                                             :rules="phoneRules"
                                             label="Número de teléfono"
+                                            mask="### ## ## ##"
                                             outline
                                             required>
                                         </v-text-field>
@@ -104,34 +107,25 @@
                                 </v-layout>
                                 <v-layout row>
                                     <v-flex xs4>
-                                        <v-overflow-btn
-                                            :items="localities"
+                                        <v-text-field
                                             v-model="address.locality"
                                             label="Localidad"
-                                            editable
-                                            outline
-                                            item-value="text">
-                                        </v-overflow-btn>
+                                            outline>
+                                        </v-text-field>
                                     </v-flex>
                                     <v-flex xs4 pl-2 pr-2>
-                                        <v-overflow-btn
-                                            :items="provinces"
+                                        <v-text-field
                                             v-model="address.province"
                                             label="Provincia"
-                                            editable
-                                            outline
-                                            item-value="text">
-                                        </v-overflow-btn>
+                                            outline>
+                                        </v-text-field>
                                     </v-flex>
                                     <v-flex xs4>
-                                        <v-overflow-btn
-                                            :items="countries"
+                                        <v-text-field
                                             v-model="address.country"
                                             label="País"
-                                            editable
-                                            outline
-                                            item-value="text">
-                                        </v-overflow-btn>
+                                            outline>
+                                        </v-text-field>
                                     </v-flex>
                                 </v-layout>
                                 <v-layout row>
@@ -148,8 +142,8 @@
                                         <v-btn
                                             block
                                             color="success"
-                                            @click.prevent="checkForm">
-                                            <v-icon>done</v-icon><span>&nbsp; Guardar datos</span>
+                                            type="submit">
+                                            <v-icon>save</v-icon><span>&nbsp; Guardar datos</span>
                                         </v-btn>
                                     </v-flex>
                                 </v-layout>
@@ -254,9 +248,9 @@
                     .then(() => {
                         this.$refs.successAlert.isShown = true
                     })
-                    .catch(() => {
-                        // active error alert component TO-DO
+                    .catch((error) => {                        
                         this.$refs.successAlert.isShown = false
+                        this.$rollbar.warning('Aviso. No se ha podido guardar el cliente en el método saveCompany() del componente CustomerCreate. ' + error)
                     })
                     .finally(() => {
                         firebase.database().goOffline()
@@ -280,14 +274,12 @@
                         this.$refs.successAlert.isShown = true                        
                     })
                     .catch((error) => {
-                        // active error alert component TO-DO
                         this.$refs.successAlert.isShown = false
+                        this.$rollbar.warning('Aviso. No se ha podido guardar el cliente en el método savePerson() del componente CustomerCreate. ' + error)
                     })
                     .finally(() => {
                         firebase.database().goOffline()
-                    })
-
-                
+                    })                
             }
         },
         props: {

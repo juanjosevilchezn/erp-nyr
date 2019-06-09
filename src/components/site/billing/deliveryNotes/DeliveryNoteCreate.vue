@@ -19,7 +19,8 @@
                     <v-btn
                         block
                         color="primary"
-                        href="/billing">
+                        href="/billing"
+                        class="elevation-6">
                         <v-icon>arrow_back</v-icon><span>&nbsp; Atrás</span>
                     </v-btn>
                 </v-flex>
@@ -28,7 +29,13 @@
             <v-layout row fill-width mt-3>
                 <InfoAlert
                     message="En este listado solo se mostrarán aquellas tareas que se encuentren finalizadas."/>
-            </v-layout>   
+            </v-layout>
+
+            <v-layout row mt-3 fill-width>
+                <SuccessAlert
+                    ref="successAlert"
+                    message="El albarán de entrega ha sido generado con éxito."/>
+            </v-layout>
 
             <v-layout row mt-3 fill-width>
                 <v-flex xs12>
@@ -43,8 +50,10 @@
                     <v-btn
                         block
                         color="success"
-                        @click="saveDeliveryNote">
-                        <v-icon>done</v-icon><span>&nbsp; Crear albarán de entrega</span>
+                        @click="saveDeliveryNote"
+                        class="elevation-6"
+                        style="margin-top: 10px;">
+                        <v-icon>create</v-icon><span>&nbsp; Crear albarán de entrega</span>
                     </v-btn>
                 </v-flex>
             </v-layout>                           
@@ -56,6 +65,7 @@
     import firebase from 'firebase'
     import ErrorDialog from '../../../dialogs/ErrorDialog'
     import InfoAlert from '../../../alerts/InfoAlert'
+    import SuccessAlert from '../../../alerts/SuccessAlert'
     import Navigation from '../../navigation/Navigation'
     import FinishedTasksDatatable from '../../../datatables/FinishedTasksDatatable'
 
@@ -69,6 +79,7 @@
             ErrorDialog,
             FinishedTasksDatatable,
             InfoAlert,
+            SuccessAlert,
             Navigation
         },
         computed: {
@@ -107,10 +118,11 @@
 
                         billingDocumentsRef.set(data)
                             .then(() => {
-                                // active success alert component TO-DO
+                                this.$refs.successAlert.isShown = true
                             })
                             .catch(error => {
-                                // active error alert component TO-DO
+                                this.$refs.successAlert.isShown = false
+                                this.$rollbar.warning('Aviso. No ha sido posible guardar el albarán de entrega en el método saveDeliveryNote() del componente DeliveryNoteCreate. ' + error)
                             })
                             .finally(() => {
                                 firebase.database().goOffline()

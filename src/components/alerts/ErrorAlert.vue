@@ -1,10 +1,9 @@
 <template>
-    <div id="success-alert" style="width: 100%;">
+    <div id="error-alert">
         <v-alert
             v-model="isShown"
             dismissible
-            type="success"
-            class="elevation-6">
+            type="error">
             {{ message }}
         </v-alert>
   </div>
@@ -12,7 +11,7 @@
 
 <script>
     export default {
-        name: 'SuccessAlert',
+        name: 'ErrorAlert',
         data() {
             return {
                 isShown: false

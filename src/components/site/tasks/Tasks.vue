@@ -4,11 +4,12 @@
 
         <v-container fluid>
             <v-layout row fill-width>
-                <v-flex xs2>
+                <v-flex xs3>
                     <v-btn
                         block
                         color="success"
-                        href="/tasks/create">
+                        href="/tasks/create"
+                        class="elevation-6">
                         <v-icon>add_circle_outline</v-icon><span>&nbsp; Nueva tarea</span>
                     </v-btn>
                 </v-flex>
@@ -19,7 +20,7 @@
                     message="Si la tarea ya ha sido entregada o facturada, no podrás modificarla ni eliminarla."/>
             </v-layout>
 
-            <v-layout row fill-width>
+            <v-layout row fill-width style="margin-top: 10px;">
                 <v-flex xs12 mt-3>
                     <TasksDatatable
                         title="Listado de tareas"/>

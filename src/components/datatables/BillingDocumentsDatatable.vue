@@ -3,7 +3,7 @@
         <UndoConfirmationDialog
             ref="undoConfirmationDialog"/>
 
-        <v-card>
+        <v-card class="elevation-6">
             <v-card-title>
                 <h4>{{ this.title }}</h4>
                 <v-spacer></v-spacer>
@@ -126,7 +126,7 @@
                     .then(() => {
                         document.involvedTasks.forEach(task => {
                         task.update({ state: 'Finalizado' })
-                            .then(res => {
+                            .then(() => {
                                 documentsRef.doc(document.id).delete()
                                     .then(() => {
                                         let index = this.documents.map(item => item.id).indexOf(document.id)
@@ -135,7 +135,7 @@
                                     })                                
                             })
                             .catch(error => {
-                                // TO-DO SEND TO ERROR PAGE
+                                this.$rollbar.warning('Aviso. No ha sido posible deshacer el documento ' + document.id + ' en el método undoDocument() del componente BillingDocumentsDatatable. ' + error)
                             })
                             .finally(() => {
                                 firebase.database().goOffline()
@@ -163,7 +163,7 @@
                                 })
                             })
                             .catch(error => {
-                                // TO-DO SEND TO ERROR PAGE
+                                this.$rollbar.critical('Crítico. No se ha podido recuperar el cliente en el método mounted() del componente BillingDocumentsDatatable. ' + error)
                             })
 
                         documentData.involvedTasks.forEach(task => {
@@ -172,13 +172,13 @@
                                 documentData.tasksData.push(res.data())
                             })
                             .catch(error => {
-                                // TO-DO SEND TO ERROR PAGE
+                                this.$rollbar.critical('Crítico. No se ha podido recuperar las tareas involucradas en el método mounted() del componente BillingDocumentsDatatable. ' + error)
                             })
                         })
                     })
                 })
                 .catch(error => {
-                    // TO-DO SEND TO ERROR PAGE
+                    this.$rollbar.critical('Crítico. No se han podido recuperar los datos de la empresa en el método mounted() del componente BillingDocumentsDatatable. ' + error)
                 })
                 .finally(() => {
                     firebase.database().goOffline()
